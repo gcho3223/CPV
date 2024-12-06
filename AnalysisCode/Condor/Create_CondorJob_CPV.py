@@ -10,7 +10,7 @@ samplelist = [
     ["TTJets_Signal_dtG_m1p0415","30"],
     ["TTJets_Signal_dtG_m2p60364","30"]
 ]
-jobversion = "v6_O3v2/CPV_Sample"
+jobversion = "v6_O3v2_2/CPV_Sample"
 
 for sample in range(len(samplelist)):
     sample_dir = f"{jobversion}/{samplelist[sample][0]}"

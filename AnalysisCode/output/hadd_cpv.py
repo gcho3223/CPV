@@ -4,7 +4,7 @@ import os
 ##### get current path #####
 print(os.getcwd())
 ##### define source file path #####
-Jobversion = 'v6_O3v2'
+Jobversion = 'v6_O3v2_2'
 originPath = f"/u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/output/{Jobversion}/CPV_Sample"
 
 ##### hadd list #####

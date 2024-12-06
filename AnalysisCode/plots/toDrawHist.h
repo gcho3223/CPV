@@ -68,7 +68,19 @@ vector<TString> hist1D =
 	"_h_Pair_Genbpt_","_h_Pair_Genbeta_","_h_Pair_Genbphi_","_h_Pair_GenAnbpt_","_h_Pair_GenAnbeta_","_h_Pair_GenAnbphi_",          // kinematics: b, Anb
 	"_h_pair_GenMupt_","_h_pair_GenMueta_","_h_pair_GenMuphi_","_h_pair_GenAnMupt_","_h_pair_GenAnMueta_","_h_pair_GenAnMuphi_",    // kinematics: Mu, AnMu
     "_h_pair_Gen_b_Anb_Mass_","_h_pair_Gen_Mu_AnMu_Mass_","_h_pair_Gen_b_AnMu_Mass_","_h_pair_Gen_Anb_Mu_Mass_",                    // invariant mass
-	"_h_GenCPO3_bfReco_","_h_GenCPO3_bfReco_ReRange_","_h_GenCPO3_Pos_","_h_GenCPO3_Neg_"                                           // O3
+	"_h_GenCPO3_bfReco_","_h_GenCPO3_bfReco_ReRange_","_h_GenCPO3_Pos_","_h_GenCPO3_Neg_",                                          // O3
+
+    ///////////////////////////
+    ///// O3 version 2 ////////
+    ///////////////////////////
+    // dR distribution before pairing
+    "_h_v2_dR_Jet1_AnLep_","_h_v2_dR_Jet2_Lep_",
+    // dR distribution after pairing with min dR
+    "_h_v2_dR_Min_Jet1_AnLep_","_h_v2_dR_Min_Jet2_Lep_",
+    "_h_v2_pair_Jet1pt_","_h_v2_pair_Jet1eta_","_h_v2_pair_Jet1phi_","_h_v2_pair_Jet2pt_","_h_v2_pair_Jet2eta_","_h_v2_pair_Jet2phi_",          // kinematics: jet1, jet2
+    "_h_v2_pair_Leppt_","_h_v2_pair_Lepeta_","_h_v2_pair_Lepphi_","_h_v2_pair_AnLeppt_","_h_v2_pair_AnLepeta_","_h_v2_pair_AnLepphi_",          // kinematics: Mu, AnMu
+    "_h_v2_Jet1_AnMu_Mass_","_h_v2_Jet2_Mu_Mass_",                                                                                              // invariant mass
+    "_h_v2_CPO3_bfReco_","_h_v2_CPO3_bfReco_ReRange_","_h_v2_CPO3_Pos_","_h_v2_CPO3_Neg_",                                                      // O3
 };
 
 vector<TString> hist2D =
@@ -78,5 +90,7 @@ vector<TString> hist2D =
        // dR distribution with different values: [0: 0.5], [1: 1.0], [2: 1.5], [3: 2.0], [4: 2.5], [5: 3.0]
        "_h_dRNum_pair_bJet_AnbJet_0_","_h_dRNum_pair_bJet_AnbJet_1_","_h_dRNum_pair_bJet_AnbJet_2_","_h_dRNum_pair_bJet_AnbJet_3_","_h_dRNum_pair_bJet_AnbJet_4_","_h_dRNum_pair_bJet_AnbJet_5_"
 	// gen level : after, under 3
-	"_h_Gen_dR_Genb_GenAnb_","_h_Gen_dR3_af_Genb_GenAnb_"
+	"_h_Gen_dR_Genb_GenAnb_","_h_Gen_dR3_af_Genb_GenAnb_",
+    // O3 version 2
+    "_h_v2_dR_Jet1_Jet2_","_h_v2_dR_Min_Jet1_Jet2_",
 };

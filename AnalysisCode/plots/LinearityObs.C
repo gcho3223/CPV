@@ -275,8 +275,9 @@ CPVari O3Asym(TH1D *hist, string version, string savepath, string vdtG, double x
     fout << Form("%s_",vdtG.c_str()) << Form("Nega: %.6f", negCount) << endl;
     fout << Form("%s_",vdtG.c_str()) << Form("Posi: %.6f", posCount) << endl;
     fout << Form("%s_",vdtG.c_str()) << Form("Asym: %.6f", Asym) << endl;
+    fout << Form("%s_",vdtG.c_str()) << Form("Asym Err: %.6f", AsymErr) << endl;
     fout << Form("%s_",vdtG.c_str()) << Form("Total: %.6f" ,total) << endl;
-    //fout << endl;
+    fout << endl;
 
     DrawOverflowBin(hist, -2, 2);
 	// save canvas

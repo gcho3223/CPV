@@ -42,7 +42,7 @@ samplelist=(
     "TTJets_Signal_dtG_m2p60364" 
 )
 ### version information ( Dataset / CPV_Sample ) ###
-version="v6_O3v2/CPV_Sample"
+version="v6_O3v2_2/CPV_Sample"
 ### submit jobs for each sample ###
 for sample in "${samplelist[@]}";
 do

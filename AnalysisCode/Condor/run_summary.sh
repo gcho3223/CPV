@@ -44,7 +44,7 @@ samplelist=(
 
 ### version information ###
 ### should change sample_path when CPV samples are used!!! ###
-version="v6_O3v2"
+version="v6_O3v2_2"
 #sample_path="./${version}/Dataset"
 sample_path="./${version}/CPV_Sample"
 

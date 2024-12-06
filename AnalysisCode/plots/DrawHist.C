@@ -54,7 +54,6 @@ void DrawHist(string version, string iscpv)
 	for(int isn=0; isn<sample.size(); isn++)
 	{
 		TString ffile;
-
 		/// file read ///
 		if(iscpv == "cpv") {ffile = Form("../output/%s/CPV_Sample/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
 		else
@@ -62,11 +61,9 @@ void DrawHist(string version, string iscpv)
 			if(isn < 30) {ffile = Form("../output/%s/Dataset/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
 			else {ffile = Form("../output/%s/Dataset/%s/%s.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
 		}
-
 		TFile *f = new TFile(ffile,"READ");
 		if(f==NULL){cout << "Something Wrong!!" << endl;}
 		else {cout << ffile.Data() << endl;}
-
 		/// draw histogram!! ///
 		for(int i1d=0; i1d<hist1D.size(); i1d++)
 		{
@@ -99,7 +96,8 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 	string savepath;
 	if(iscpv == "cpv")
 	{
-		if(hname.Contains("Gen")){savepath = Form("./%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
+		if(hname.Contains("Gen")) {savepath = Form("./%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
 		else {savepath = Form("./%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
 	}
 	else {savepath = Form("./%s/Dataset/%s",version.c_str(),sample.c_str());}
@@ -263,6 +261,7 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 	if(iscpv == "cpv")
 	{
 		if(hname.Contains("Gen")){savepath = Form("./%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
 		else {savepath = Form("./%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
 	}
 	else {savepath = Form("./%s/%s",version.c_str(),sample.c_str());}

@@ -15,4 +15,4 @@
 #./ssb_analysis CEDM_Sample/TTJets_Signal_dtG_m1p0415/TTJets_Signal_dtG_m1p0415.list ttbar_v6/CEDM/v5/TTJets_Signal_dtG_m1p0415.root 0 TTJets_Signal_dtG_m1p0415
 #./ssb_analysis CEDM_Sample/TTJets_Signal_dtG_m2p60364/TTJets_Signal_dtG_m2p60364.list ttbar_v6/CEDM/v5/TTJets_Signal_dtG_m2p60364.root 0 TTJets_Signal_dtG_m2p60364
 
-./ssb_analysis CEDM_Sample/TTJets_Signal_dtG_0/TTJets_Signal_dtG_0_1.list TTJets_Signal_dtG_0_v6_O3v2_2.root 0 TTJets_Signal_dtG_0
+./ssb_analysis CEDM_Sample/TTJets_Signal_dtG_0/TTJets_Signal_dtG_0_1.list TTJets_Signal_dtG_0_v6_O3v2_5.root 0 TTJets_Signal_dtG_0
