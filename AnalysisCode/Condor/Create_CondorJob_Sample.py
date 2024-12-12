@@ -34,7 +34,7 @@ samplelist = [
     #["ZZ","2"]
 ]
 
-jobversion = "v5_InvtMass_dR/Dataset"
+jobversion = "Job_Version/v6_O3v2_3/Dataset"
 
 for sample in range(len(samplelist)):
     sample_dir = f"{jobversion}/{samplelist[sample][0]}"
@@ -68,7 +68,7 @@ for sample in range(len(samplelist)):
         file.write("universe = vanilla \n")
         file.write("executable = condor_run.sh \n\n")
         file.write("arguments = $(Process) \n")
-        file.write("request_memory = 6050 MB \n\n")
+        file.write("request_memory = 6144 MB \n\n") #data: 6144, MC: 3072
         file.write("should_transfer_files = YES \n")
         file.write("when_to_transfer_output = ON_EXIT \n\n")
         file.write("output = /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/Condor/%s/%s/log_condor/out/out_$(Process).out \n" %(jobversion, samplelist[sample][0]) )

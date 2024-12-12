@@ -25,8 +25,8 @@ samplelist = [
     #["TTbar_WJetToLNu",[]],
     #["TTbar_WQQ",[]],
     #["TTbar_ZQQ",[]],
-    #["TTbar_ZToLLNuNu",[]],
-    #["TTJets_others",[]],
+    ["TTbar_ZToLLNuNu",["22"]],
+    ["TTJets_others",["63","79","92","167","179","198","208","210","212","219","238","417","429","444","475","482","492","507","515","530","539","548","566","576","592"]],
     #["TTJets_Signal",[]],
     #["WJetsToLNu",[]],
     #["WW",[]],
@@ -34,22 +34,25 @@ samplelist = [
     #["ZZ",[]],
     #["TTJets_Signal_dtG_0",[]],
     #["TTJets_Signal_dtG_0p5207",[]],
-    ["TTJets_Signal_dtG_1p0415",["13"]],
+    #["TTJets_Signal_dtG_1p0415",["13"]],
     #["TTJets_Signal_dtG_2p60364",[]],
     #["TTJets_Signal_dtG_m0p5207",[]],
     #["TTJets_Signal_dtG_m1p0415",[]],
     #["TTJets_Signal_dtG_m2p60364",[]]
 ]
 
-jobversion = "v6_O3v2/CPV_Sample"
+#jobversion = "Job_Version/v6_O3v2_2/CPV_Sample"
+jobversion = "Job_Version/v6_O3v2_2/Dataset"
 
 for sample in range(len(samplelist)):
     sample_dir = f"{jobversion}/{samplelist[sample][0]}"
     ### delete log, err, out files for the failed jobs in log_condor directory ###
-    for job_number in samplelist[sample][1]:
-        os.remove(os.path.join(f"{sample_dir}/log_condor/err/err_{job_number}.err"))
-        os.remove(os.path.join(f"{sample_dir}/log_condor/log/log_{job_number}.log"))
-        os.remove(os.path.join(f"{sample_dir}/log_condor/out/out_{job_number}.out"))
+    for f in os.listdir(f"{sample_dir}/log_condor/err"):
+        os.remove(os.path.join(f"{sample_dir}/log_condor/err", f))
+    for f in os.listdir(f"{sample_dir}/log_condor/log"):
+        os.remove(os.path.join(f"{sample_dir}/log_condor/log", f))
+    for f in os.listdir(f"{sample_dir}/log_condor/out"):
+        os.remove(os.path.join(f"{sample_dir}/log_condor/out", f))
     ### created executive condor job: condor_run.sh ###
     with open(f"{sample_dir}/recondor_run.sh", "w") as file:
         file.write("#!/bin/bash \n\n")

@@ -2,44 +2,44 @@
 
 samplelist=( 
     ### Data & MC Samples ###
-    "Data_DoubleMuon_Run2016B" 
-    "Data_DoubleMuon_Run2016C" 
-    "Data_DoubleMuon_Run2016D" 
-    "Data_DoubleMuon_Run2016E" 
-    "Data_DoubleMuon_Run2016F" 
-    "Data_DoubleMuon_Run2016G" 
-    "Data_DoubleMuon_Run2016HV2" 
-    "Data_DoubleMuon_Run2016HV3" 
-    "Data_SingleMuon_Run2016B" 
-    "Data_SingleMuon_Run2016C" 
-    "Data_SingleMuon_Run2016D" 
-    "Data_SingleMuon_Run2016E" 
-    "Data_SingleMuon_Run2016F" 
-    "Data_SingleMuon_Run2016G" 
-    "Data_SingleMuon_Run2016HV2" 
-    "Data_SingleMuon_Run2016HV3" 
-    "DYJetsToLL_M_10To50" 
+    #"Data_DoubleMuon_Run2016B" 
+    #"Data_DoubleMuon_Run2016C" 
+    #"Data_DoubleMuon_Run2016D" 
+    #"Data_DoubleMuon_Run2016E" 
+    #"Data_DoubleMuon_Run2016F" 
+    #"Data_DoubleMuon_Run2016G" 
+    #"Data_DoubleMuon_Run2016HV2" 
+    #"Data_DoubleMuon_Run2016HV3" 
+    #"Data_SingleMuon_Run2016B" 
+    #"Data_SingleMuon_Run2016C" 
+    #"Data_SingleMuon_Run2016D" 
+    #"Data_SingleMuon_Run2016E" 
+    #"Data_SingleMuon_Run2016F" 
+    #"Data_SingleMuon_Run2016G" 
+    #"Data_SingleMuon_Run2016HV2" 
+    #"Data_SingleMuon_Run2016HV3" 
+    #"DYJetsToLL_M_10To50" 
     #"DYJetsToLL_M_50" 
-    "ST_tW_antitop" 
+    #"ST_tW_antitop" 
     #"ST_tW_top" 
-    "TTbar_WJetToLNu" 
-    "TTbar_WQQ" 
-    "TTbar_ZQQ" 
+    #"TTbar_WJetToLNu" 
+    #"TTbar_WQQ" 
+    #"TTbar_ZQQ" 
     #"TTbar_ZToLLNuNu" 
     #"TTJets_others" 
     #"TTJets_Signal" 
     #"WJetsToLNu" 
-    "WW" 
-    "WZ" 
-    "ZZ" 
+    #"WW" 
+    #"WZ" 
+    #"ZZ" 
     ### CPV samples ### 
     "TTJets_Signal_dtG_0" 
-    "TTJets_Signal_dtG_0p5207" 
-    "TTJets_Signal_dtG_1p0415" 
-    "TTJets_Signal_dtG_2p60364" 
-    "TTJets_Signal_dtG_m0p5207" 
-    "TTJets_Signal_dtG_m1p0415" 
-    "TTJets_Signal_dtG_m2p60364" 
+    #"TTJets_Signal_dtG_0p5207" 
+    #"TTJets_Signal_dtG_1p0415" 
+    #"TTJets_Signal_dtG_2p60364" 
+    #"TTJets_Signal_dtG_m0p5207" 
+    #"TTJets_Signal_dtG_m1p0415" 
+    #"TTJets_Signal_dtG_m2p60364" 
 )
 ######################################################################
 ### before running, should change samples you want to make summary ###
@@ -48,7 +48,7 @@ samplelist=(
 ###########################
 ### version information ###
 ###########################
-version="v6_O3v2_2"
+version="v6_O3v2_3"
 
 #########################################################
 ### set up sample_path                                ###
@@ -63,11 +63,10 @@ for i in "${samplelist[@]}"
 do
     # CPV 샘플인지 확인
     if [[ $i == TTJets_Signal_dtG_* ]]; then
-        sample_path="./${version}/CPV_Sample"
+        sample_path="./Job_Version/${version}/CPV_Sample"
     else
-        sample_path="./${version}/Dataset"
+        sample_path="./Job_Version/${version}/Dataset"
     fi
-
     # 로그 파일 경로 설정 및 파일 개수 계산
     log_path="${sample_path}/${i}/log_condor/out"
     file_count=$(ls "$log_path"/*.out 2>/dev/null | wc -l)
@@ -76,6 +75,7 @@ done
 # total_sample가 0인지 확인
 if (( total_sample == 0 )); then
     echo "No log files found. Exiting."
+    echo "Please check the log files in ${sample_path} directory."
     exit 1
 fi
 #########################################
@@ -88,8 +88,10 @@ do
     ################################################
     # CPV 샘플인지 확인
     if [[ $i == TTJets_Signal_dtG_* ]]; then
+        load_path="./Job_Version/${version}/CPV_Sample"
         sample_path="./${version}/CPV_Sample"
     else
+        load_path="./Job_Version/${version}/Dataset"
         sample_path="./${version}/Dataset"
     fi
     # 디렉토리 및 파일 생성
@@ -97,9 +99,9 @@ do
     > ./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt
     > ./Run_Summary/${sample_path}/${i}/Memory_Summary_${i}.txt
     ## define log, err, out path ##
-    log_path="${sample_path}/${i}/log_condor/log"
-    out_path="${sample_path}/${i}/log_condor/out"
-    err_path="${sample_path}/${i}/log_condor/err"
+    log_path="${load_path}/${i}/log_condor/log"
+    out_path="${load_path}/${i}/log_condor/out"
+    err_path="${load_path}/${i}/log_condor/err"
     ##########################################  
     ###       calc # of log files         ###
     ##########################################
@@ -107,6 +109,7 @@ do
     # skip if there is no logfile -> to obtail the number of queue
     if (( file_count == 0 )); then
         echo "No log files found for ${i}" >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"
+        echo "sample path: ${sample_path}" >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"
         continue
     fi
     failed_evt=()
