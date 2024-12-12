@@ -612,6 +612,9 @@ class ssb_analysis : public SSBTree
       ///// new algorithm /////
       TString cutdRName[6] = {"0.5","1.0","1.5","2.0","2.5","3.0"};
 
+      std::vector<double> dR_jet_Lep;
+      std::vector<double> dR_jet_AnLep;
+
       TLorentzVector *highPtJet; // highetst pT of jet
       TLorentzVector *leading_bTagJet; // highetst pT b tagging jet
       TLorentzVector *pair_bJet;       // b jet after pairing
@@ -619,15 +622,15 @@ class ssb_analysis : public SSBTree
       TLorentzVector *pair_Lep;        // lepton after pairing
       TLorentzVector *pair_AnLep;      // anti lepton after pairing
       
-      TLorentzVector *v2_pair_Jet1;    // paired with AnLep with minimum dR
-      TLorentzVector *v2_pair_Jet2;    // paired with Lep with minimum dR
-      TLorentzVector *v2_pair_Lep;     // paired with Jet1 with munimum dR
-      TLorentzVector *v2_pair_AnLep;   // paired with Jet2 with munimum dR
+      TLorentzVector *v2_pair_Jet;     // paired with AnLep with minimum dR
+      TLorentzVector *v2_pair_AnJet;   // paired with Lep with minimum dR
+      TLorentzVector *v2_pair_Lep;     // paired with Jet with minimum dR
+      TLorentzVector *v2_pair_AnLep;   // paired with AnJet with minimum dR
 
-      TLorentzVector *Genb;         // b quark at generator level
-      TLorentzVector *GenAnb;       // anti-b quark at generator level
-      TLorentzVector *GenMu;        // muon at generator level
-      TLorentzVector *GenAnMu;      // anti-muon at generator level
+      TLorentzVector *Genb;            // b quark at generator level
+      TLorentzVector *GenAnb;          // anti-b quark at generator level
+      TLorentzVector *GenMu;           // muon at generator level
+      TLorentzVector *GenAnMu;         // anti-muon at generator level
 
 
       // TLorentzVector : MET
@@ -803,6 +806,10 @@ class ssb_analysis : public SSBTree
       TH1D *h_pair_Mu_AnMu_Mass[6];
       TH1D *h_pair_b_AnMu_Mass[6];
       TH1D *h_pair_Anb_Mu_Mass[6];
+      TH1D *h_pair_bJet_Mass[6];
+      TH1D *h_pair_AnbJet_Mass[6];
+      TH1D *h_pair_Lep_Mass[6];
+      TH1D *h_pair_AnLep_Mass[6];
       // calcuate O3
       TH1D *h_CPO3_bfReco[6];
       TH1D *h_CPO3_bfReco_ReRange[6];
@@ -847,6 +854,10 @@ class ssb_analysis : public SSBTree
       TH1D *h_pair_Gen_Mu_AnMu_Mass;
       TH1D *h_pair_Gen_b_AnMu_Mass;
       TH1D *h_pair_Gen_Anb_Mu_Mass;
+      TH1D *h_pair_Gen_b_Mass;
+      TH1D *h_pair_Gen_Anb_Mass;
+      TH1D *h_pair_Gen_Mu_Mass;
+      TH1D *h_pair_Gen_AnMu_Mass;
       // calcuate O3
       TH1D *h_GenCPO3_bfReco;
       TH1D *h_GenCPO3_bfReco_ReRange;
@@ -854,35 +865,57 @@ class ssb_analysis : public SSBTree
       TH1D *h_GenCPO3_Neg;
 
       ///// O3 version 2 /////
-      // dR distribution
-      TH1D *h_v2_dR_Jet1_AnLep;
-      TH1D *h_v2_dR_Jet2_Lep;
-      TH1D *h_v2_dR_Min_Jet1_AnLep;
-      TH1D *h_v2_dR_Min_Jet2_Lep;
-      TH2D *h_v2_dR_Jet1_Jet2;
-      TH2D *h_v2_dR_Min_Jet1_Jet2;
-      // comparison btw O3 v1 & v2
-      TH1D *h_v2_Jet1_idx;
-      TH1D *h_v2_Jet2_idx;
-      TH2D *h_v2_Jet12_idx;
-      TH2D *h_comp_Jet1_pairbJet;
-      TH2D *h_comp_Jet2_pairAnbJet;
+      //////////////////////
+      /// before pairing ///
+      //////////////////////
+      TH1D *h_AllJet_idx;
+      TH1D *h_AllJet_pt;
+      TH1D *h_AllJet_eta;
+      TH1D *h_AllJet_phi;
+      // all of dR distribution
+      TH1D *h_v2_dR_AnLep;
+      TH1D *h_v2_dR_Lep;
+      TH2D *h_v2_dR_Lep_AnLep;
+      // find minimum dR
+      TH1D *h_v2_dR_Min_Lep;
+      TH1D *h_v2_dR_Min_AnLep;
+      TH2D *h_v2_dR_Min_Lep_AnLep;
+      /////////////////////
+      /// after pairing ///
+      /////////////////////
+      /// Jet & AnLep ///
+      ///////////////////
+      // check dR values final_dR_jet1_AnLep is the same as min_dR_jet1_AnLep and index is the same as idx_jet1
+      TH1D *h_v2_pair_Jet_dR_AnLep;
+      TH1D *h_v2_pair_Jet_idx;
       // kinematics
-      TH1D *h_v2_pair_Jet1pt;
-      TH1D *h_v2_pair_Jet1eta;
-      TH1D *h_v2_pair_Jet1phi;
-      TH1D *h_v2_pair_Jet2pt;
-      TH1D *h_v2_pair_Jet2eta;
-      TH1D *h_v2_pair_Jet2phi;
-      TH1D *h_v2_pair_Leppt;
-      TH1D *h_v2_pair_Lepeta;
-      TH1D *h_v2_pair_Lepphi;
+      TH1D *h_v2_pair_Jetpt;
+      TH1D *h_v2_pair_Jeteta;
+      TH1D *h_v2_pair_Jetphi;
       TH1D *h_v2_pair_AnLeppt;
       TH1D *h_v2_pair_AnLepeta;
       TH1D *h_v2_pair_AnLepphi;
+      ///////////////////
+      /// AnJet & Lep ///
+      ///////////////////
+      // check dR values final_dR_jet1_AnLep is the same as min_dR_jet1_AnLep and index is the same as idx_jet1
+      TH1D *h_v2_pair_AnJet_dR_Lep;
+      TH1D *h_v2_pair_AnJet_idx;
+      // kinematics
+      TH1D *h_v2_pair_AnJetpt;
+      TH1D *h_v2_pair_AnJeteta;
+      TH1D *h_v2_pair_AnJetphi;
+      TH1D *h_v2_pair_Leppt;
+      TH1D *h_v2_pair_Lepeta;
+      TH1D *h_v2_pair_Lepphi;
+      // distribution of idx
+      TH2D *h_v2_pair_Jet_AnJet_idx;
+      TH2D *h_v2_pair_comp_Jet_pairbJet;
+      TH2D *h_v2_pair_comp_AnJet_pairAnbJet;
       // invariant mass
-      TH1D *h_v2_Jet1_AnMu_Mass;
-      TH1D *h_v2_Jet2_Mu_Mass;
+      TH1D *h_v2_pair_Jet_AnMu_Mass;
+      TH1D *h_v2_pair_AnJet_Mu_Mass;
+      TH2D *h_v2_pair_Jet_AnbJet_Mass;
       // O3
       TH1D *h_v2_CPO3_bfReco;
       TH1D *h_v2_CPO3_bfReco_ReRange;

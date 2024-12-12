@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <algorithm>
 #include "TMath.h"
 #include "TH2.h"
 #include "TStyle.h"
@@ -323,8 +323,8 @@ void ssb_analysis::TLVInitial()
    pair_Lep = new TLorentzVector();
    pair_AnLep = new TLorentzVector();
    // O3 version 2
-   v2_pair_Jet1 = new TLorentzVector();
-   v2_pair_Jet2 = new TLorentzVector();
+   v2_pair_Jet = new TLorentzVector();
+   v2_pair_AnJet = new TLorentzVector();
    v2_pair_Lep = new TLorentzVector();
    v2_pair_AnLep = new TLorentzVector();
 
@@ -1093,11 +1093,14 @@ void ssb_analysis::Loop( char *logfile )
                         FillHisto(h_pair_AnLepphi[idr]   ,pair_AnLep->Phi()  ,evt_weight_);                                       
                         //invariant mass distribution
                         // 1) (An)bJet - (An)Mu
-                        FillHisto(h_pair_b_Anb_Mass[idr]   , ( (*pair_bJet)+(*pair_AnbJet) ).M()  , evt_weight_ );
-                        FillHisto(h_pair_Mu_AnMu_Mass[idr] , ( (*pair_Lep)+(*pair_AnLep) ).M()    , evt_weight_ );
+                        FillHisto(h_pair_b_Anb_Mass[idr]   ,( (*pair_bJet)+(*pair_AnbJet) ).M()  ,evt_weight_ );
+                        FillHisto(h_pair_Mu_AnMu_Mass[idr] ,( (*pair_Lep)+(*pair_AnLep) ).M()    ,evt_weight_ );
                         // 2) bJet - AnbJet , Mu - AnMu
-                        FillHisto(h_pair_b_AnMu_Mass[idr]  , ( (*pair_bJet)+(*pair_AnLep) ).M()   , evt_weight_ );
-                        FillHisto(h_pair_Anb_Mu_Mass[idr]  , ( (*pair_AnbJet)+(*pair_Lep) ).M()   , evt_weight_ );
+                        FillHisto(h_pair_b_AnMu_Mass[idr]  ,( (*pair_bJet)+(*pair_AnLep) ).M()   ,evt_weight_ );
+                        FillHisto(h_pair_Anb_Mu_Mass[idr]  ,( (*pair_AnbJet)+(*pair_Lep) ).M()   ,evt_weight_ );
+                        //cout << "Reco O3 v1 dR: " << v_dR_value[idr] << endl;
+                        //cout << "bJet: " << (*pair_bJet).M() << ", AnbJet: " << (*pair_AnbJet).M() << ", Lep: " << (*pair_Lep).M() << ", AnLep: " << (*pair_AnLep).M() << endl;
+                        //cout << "bJet-AnLep: " << ( (*pair_bJet)+(*pair_AnLep) ).M() << ", AnbJet-Lep: " << ( (*pair_AnbJet)+(*pair_Lep) ).M() << endl;
                         // calculate O3
                         double n_cpO3 = ssbcpviol->getO3Vari( pair_bJet , pair_AnbJet, pair_AnLep, pair_Lep );
                         if(n_cpO3 == 0.0 ){cout << "--00000000000000--" << n_cpO3 << endl;}
@@ -1249,7 +1252,14 @@ void ssb_analysis::Loop( char *logfile )
                         FillHisto(h_pair_Gen_b_AnMu_Mass , ( (*Genb)+(*GenAnMu) ).M()  , evt_weight_ );
                         FillHisto(h_pair_Gen_Anb_Mu_Mass , ( (*GenAnb)+(*GenMu) ).M()  , evt_weight_ );
                         //cout << "invariant mass: b-b: " << ( (*Genb)+(*GenAnb) ).M() << ", mu-mu: " << ( (*GenMu)+(*GenAnMu) ).M() << ", b-anmu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anb-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
-
+                        // 3) b & anti-b, Mu & anti-mu mass
+                        FillHisto(h_pair_Gen_b_Mass       ,(*Genb).M()       ,evt_weight_ );
+                        FillHisto(h_pair_Gen_Anb_Mass     ,(*GenAnb).M()     ,evt_weight_ );
+                        FillHisto(h_pair_Gen_Mu_Mass      ,(*GenMu).M()      ,evt_weight_ );
+                        FillHisto(h_pair_Gen_AnMu_Mass    ,(*GenAnMu).M()    ,evt_weight_ );
+                        //cout << "Gen" << endl;
+                        //cout << "b: " << (*Genb).M() << ", anti-b: " << (*GenAnb).M() << ", mu: " << (*GenMu).M() << ", anti-mu: " << (*GenAnMu).M() << endl;
+                        //cout << "b-anti-mu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anti-b-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
                         // calculate O3
                         double n_GencpO3 = ssbcpviol->getO3Vari( Genb , GenAnb, GenAnMu, GenMu );
                         if (n_GencpO3 == 0.0 ) {cout << "--GEN: 00000000000000--: " << n_GencpO3 << endl;}
@@ -1268,86 +1278,187 @@ void ssb_analysis::Loop( char *logfile )
                   //       - also paired jet is exclude at the next matching                                                       //
                   //       - get O3 with dR < 3.0                                                                                  //
                   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  double dR_jet1_AnLep = 999.0;
-                  double dR_jet2_Lep = 999.0;
-                  double min_dR_jet1_AnLep = 999.0;
-                  double min_dR_jet2_Lep = 999.0;
-                  int idx_jet1 = -1;
-                  int idx_jet2 = -1;
+                  // 1) All jets; before pairing   //
+                  ///////////////////////////////////
                   for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
                   {
-                     // Calculate dR between ith jet and AnLep
-                     dR_jet1_AnLep = v_jet_TL[ijet]->DeltaR((*((TLorentzVector*)AnLep))); 
-                     if(dR_jet1_AnLep <= min_dR_jet1_AnLep)
+                     FillHisto(h_AllJet_idx  ,ijet                     ,evt_weight_);
+                     FillHisto(h_AllJet_pt   ,v_jet_TL[ijet]->Pt()     ,evt_weight_);
+                     FillHisto(h_AllJet_eta  ,v_jet_TL[ijet]->Eta()    ,evt_weight_);
+                     FillHisto(h_AllJet_phi  ,v_jet_TL[ijet]->Phi()    ,evt_weight_);
+                  }
+                  //-----------------------------------------------------------//
+                  // 2) finding Jet1 & Jet2 which have minimum dR with AnLep & Lep
+                  //-----------------------------------------------------------//
+                  // dR 계산 및 매칭 로직 구현
+                  // 제트와 Lep, AnLep 간의 dR 값을 제트 인덱스 순서대로 저장
+                  dR_jet_Lep.clear();
+                  dR_jet_AnLep.clear();
+                  cout << " =============== dR with Lep & AnLep =============== " << endl;
+                  for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
+                  {
+                     double dR_Lep = v_jet_TL[ijet]->DeltaR(*((TLorentzVector*)Lep));
+                     double dR_AnLep = v_jet_TL[ijet]->DeltaR(*((TLorentzVector*)AnLep));
+                     dR_jet_Lep.push_back(dR_Lep);
+                     dR_jet_AnLep.push_back(dR_AnLep);
+                     // all of dR distribution
+                     FillHisto(h_v2_dR_Lep          ,dR_Lep            ,evt_weight_);
+                     FillHisto(h_v2_dR_AnLep        ,dR_AnLep          ,evt_weight_);
+                     FillHisto(h_v2_dR_Lep_AnLep    ,dR_Lep            ,dR_AnLep         ,evt_weight_);
+                     cout << "dR_jet_Lep[" << ijet << "]: " << dR_Lep << ", dR_jet_AnLep[" << ijet << "]: " << dR_AnLep << endl;
+                  }
+                  // 최소 dR 값과 해당 제트 인덱스 찾기
+                  auto min_iter_jet_Lep = std::min_element(dR_jet_Lep.begin(), dR_jet_Lep.end());
+                  int min_index_jet_Lep = std::distance(dR_jet_Lep.begin(), min_iter_jet_Lep);
+                  double min_dR_jet_Lep = *min_iter_jet_Lep;
+                  auto min_iter_jet_AnLep = std::min_element(dR_jet_AnLep.begin(), dR_jet_AnLep.end());
+                  int min_index_jet_AnLep = std::distance(dR_jet_AnLep.begin(), min_iter_jet_AnLep);
+                  double min_dR_jet_AnLep = *min_iter_jet_AnLep;
+                  // 매칭 로직
+                  if(min_index_jet_Lep != min_index_jet_AnLep)
+                  {
+                     // 경우 1: 서로 다른 제트가 최소 dR을 가짐
+                     v2_pair_AnJet = v_jet_TL[min_index_jet_Lep]; // Lep과 매칭된 제트를 AnJet으로
+                     v2_pair_Jet = v_jet_TL[min_index_jet_AnLep]; // AnLep과 매칭된 제트를 Jet으로
+                     v2_pair_Lep = Lep;
+                     v2_pair_AnLep = AnLep;
+                  }
+                  else
+                  {
+                     // 경우 2: 같은 제트가 Lep와 AnLep에 대한 최소 dR을 가짐
+                     if(min_dR_jet_Lep < min_dR_jet_AnLep)
                      {
-                        min_dR_jet1_AnLep = dR_jet1_AnLep;
-                        v2_pair_Jet1 = v_jet_TL[ijet];
+                        // 서브 경우 (1): Lep와의 dR이 더 작음
+                        v2_pair_AnJet = v_jet_TL[min_index_jet_Lep];
+                        v2_pair_Lep = Lep;
                         v2_pair_AnLep = AnLep;
-                        idx_jet1 = ijet; // Update index for Jet1
-                        //cout << "Jet1[ijet]: " << ijet << ", pT: " << v_jet_TL[ijet]->Pt() << endl;
+                        // 두 번째로 작은 dR_AnLep 찾기
+                        double second_min_dR_jet_AnLep = std::numeric_limits<double>::max();
+                        int second_min_index_jet_AnLep = -1;
+                        for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
+                        {
+                           if(ijet == min_index_jet_AnLep) continue; // 이미 매칭된 제트 제외
+                           if(dR_jet_AnLep[ijet] < second_min_dR_jet_AnLep)
+                           {
+                              second_min_dR_jet_AnLep = dR_jet_AnLep[ijet];
+                              second_min_index_jet_AnLep = ijet;
+                           }
+                        }
+                        if(second_min_index_jet_AnLep != -1)
+                        {
+                           v2_pair_Jet = v_jet_TL[second_min_index_jet_AnLep];
+                           min_dR_jet_AnLep = second_min_dR_jet_AnLep; //update min_dR_jet_AnLep
+                           min_index_jet_AnLep = second_min_index_jet_AnLep; //update min_index_jet_AnLep
+                        }
+                        else
+                        {
+                           // 두 번째 매칭 제트가 없는 경우 처리
+                           v2_pair_Jet = nullptr;
+                           std::cerr << "두 번째 매칭 제트를 찾을 수 없습니다." << std::endl;
+                        }
                      }
-                  }
-                  // Now find the closest jet to Lep, excluding the jet found for AnLep
-                  for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
-                  {
-                     // Calculate dR between ith jet and Lep
-                     dR_jet2_Lep = v_jet_TL[ijet]->DeltaR((*((TLorentzVector*)Lep))); 
-                     if(dR_jet2_Lep <= min_dR_jet2_Lep && ijet != idx_jet1) // Exclude Jet1
+                     else
                      {
-                       min_dR_jet2_Lep = dR_jet2_Lep;
-                       v2_pair_Jet2 = v_jet_TL[ijet];
-                       v2_pair_Lep = Lep;
-                       idx_jet2 = ijet; // Update index for Jet2
-                       //cout << "Jet2[ijet]: " << ijet << ", pT: " << v_jet_TL[ijet]->Pt() << endl;
+                        // 서브 경우 (2): AnLep과의 dR이 더 작음
+                        v2_pair_Jet = v_jet_TL[min_index_jet_AnLep];
+                        v2_pair_AnLep = AnLep;
+                        v2_pair_Lep = Lep;
+                        // 두 번째로 작은 dR_Lep 찾기
+                        double second_min_dR_jet_Lep = std::numeric_limits<double>::max();
+                        int second_min_index_jet_Lep = -1;
+                        for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
+                        {
+                           if(ijet == min_index_jet_Lep) continue; // 이미 매칭된 제트 제외
+                           if(dR_jet_Lep[ijet] < second_min_dR_jet_Lep)
+                           {
+                              second_min_dR_jet_Lep = dR_jet_Lep[ijet];
+                              second_min_index_jet_Lep = ijet;
+                           }
+                        }
+                        if(second_min_index_jet_Lep != -1)
+                        {
+                           v2_pair_AnJet = v_jet_TL[second_min_index_jet_Lep];
+                           min_dR_jet_Lep = second_min_dR_jet_Lep; //update min_dR_jet_Lep
+                           min_index_jet_Lep = second_min_index_jet_Lep; //update min_index_jet_Lep
+                        }
+                        else
+                        {
+                           // 두 번째 매칭 제트가 없는 경우 처리
+                           v2_pair_AnJet = nullptr;
+                           std::cerr << "두 번째 매칭 제트를 찾을 수 없습니다." << std::endl;
+                        }
                      }
                   }
-                  //cout << "Jet1 index " << idx_jet1 << ": dR_jet1_AnLep = " << dR_jet1_AnLep << ", min_dR_jet1_AnLep = " << min_dR_jet1_AnLep << endl;
-                  //cout << "Jet2 index " << idx_jet2 << ": dR_jet2_Lep = " << dR_jet2_Lep << ", min_dR_jet2_Lep = " << min_dR_jet2_Lep << endl;
-                  //cout << "jet1 pT: " << v2_pair_Jet1->Pt() << ", jet2 pT: " << v2_pair_Jet2->Pt() << endl;
-                  // distribution for index of jet1, jet2
-                  FillHisto(h_v2_Jet1_idx                ,idx_jet1);
-                  FillHisto(h_v2_Jet2_idx                ,idx_jet2);
-                  FillHisto(h_v2_Jet12_idx               ,idx_jet1               ,idx_jet2);
-                  FillHisto(h_comp_Jet1_pairbJet         ,v2_pair_Jet1->Pt()     ,pair_bJet->Pt()     ,evt_weight_); //Jet1 & pair_bJet are matched AnMu
-                  FillHisto(h_comp_Jet2_pairAnbJet       ,v2_pair_Jet1->Pt()     ,pair_AnbJet->Pt()   ,evt_weight_); //Jet2 & pair_AnbJet are matched Mu
-                  // all of dR distribution
-                  FillHisto(h_v2_dR_Jet1_AnLep        ,dR_jet1_AnLep          ,evt_weight_);
-                  FillHisto(h_v2_dR_Jet2_Lep          ,dR_jet2_Lep            ,evt_weight_);
+                  cout << "v2_pair_Jet_idx: " << min_index_jet_AnLep << ", dR: " << min_dR_jet_AnLep << ", pt: " << v2_pair_Jet->Pt() << ", v2_pair_AnJet_idx: " << min_index_jet_Lep << ", dR: " << min_dR_jet_Lep << ", pt: " << v2_pair_AnJet->Pt() << endl;
                   // minimum dR distribution
-                  FillHisto(h_v2_dR_Min_Jet1_AnLep    ,min_dR_jet1_AnLep      ,evt_weight_);
-                  FillHisto(h_v2_dR_Min_Jet2_Lep      ,min_dR_jet2_Lep        ,evt_weight_);
-                  // dR scatter
-                  FillHisto(h_v2_dR_Jet1_Jet2         ,dR_jet1_AnLep          ,dR_jet2_Lep         ,evt_weight_);
-                  FillHisto(h_v2_dR_Min_Jet1_Jet2     ,min_dR_jet1_AnLep      ,min_dR_jet2_Lep     ,evt_weight_);
-                  // kinematics
-                  if(v2_pair_Jet1 && v2_pair_Jet2 && v2_pair_Lep && v2_pair_AnLep)
+                  FillHisto(h_v2_dR_Min_Lep        ,min_dR_jet_Lep         ,evt_weight_);
+                  FillHisto(h_v2_dR_Min_AnLep      ,min_dR_jet_AnLep       ,evt_weight_);
+                  FillHisto(h_v2_dR_Min_Lep_AnLep  ,min_dR_jet_Lep         ,min_dR_jet_AnLep     ,evt_weight_);
+                  ////////////////////
+                  // after pairing  //
+                  ////////////////////------------------------------------------------------------------------------//
+                  // 3) Jet1 & Jet2 which have minimum dR with AnLep & Lep are matched with pair_bJet & pair_AnbJet
+                  //------------------------------------------------------------------------------------------------//
+                  // Jet & AnLep
+                  if(min_index_jet_AnLep != -1 && v2_pair_Jet != nullptr && v2_pair_AnLep)
                   {
-                     if(min_dR_jet1_AnLep < 3.0 && min_dR_jet2_Lep < 3.0)
-                     {
-                        FillHisto(h_v2_pair_Jet1pt          ,v2_pair_Jet1->Pt()     ,evt_weight_);
-                        FillHisto(h_v2_pair_Jet1eta         ,v2_pair_Jet1->Eta()    ,evt_weight_);
-                        FillHisto(h_v2_pair_Jet1phi         ,v2_pair_Jet1->Phi()    ,evt_weight_);
-                        FillHisto(h_v2_pair_Jet2pt          ,v2_pair_Jet2->Pt()     ,evt_weight_);
-                        FillHisto(h_v2_pair_Jet2eta         ,v2_pair_Jet2->Eta()    ,evt_weight_);
-                        FillHisto(h_v2_pair_Jet2phi         ,v2_pair_Jet2->Phi()    ,evt_weight_);
-                        FillHisto(h_v2_pair_Leppt           ,v2_pair_Lep->Pt()      ,evt_weight_);
-                        FillHisto(h_v2_pair_Lepeta          ,v2_pair_Lep->Eta()     ,evt_weight_);
-                        FillHisto(h_v2_pair_Lepphi          ,v2_pair_Lep->Phi()     ,evt_weight_);
-                        FillHisto(h_v2_pair_AnLeppt         ,v2_pair_AnLep->Pt()    ,evt_weight_);
-                        FillHisto(h_v2_pair_AnLepeta        ,v2_pair_AnLep->Eta()   ,evt_weight_);
-                        FillHisto(h_v2_pair_AnLepphi        ,v2_pair_AnLep->Phi()   ,evt_weight_);
-                        // invariant mass
-                        FillHisto(h_v2_Jet1_AnMu_Mass       , ( (*v2_pair_Jet1)+(*v2_pair_AnLep) ).M()  , evt_weight_ );
-                        FillHisto(h_v2_Jet2_Mu_Mass         , ( (*v2_pair_Jet2)+(*v2_pair_Lep) ).M()    , evt_weight_ );
-                        // calcualte O3
-                        double n_cpO3_v2 = ssbcpviol->getO3Vari( v2_pair_Jet1 , v2_pair_Jet2, v2_pair_AnLep, v2_pair_Lep );
-                        if(n_cpO3_v2 == 0.0 ){cout << "O3 version2 --00000000000000--" << n_cpO3_v2 << endl;}
-                        // Calculating O3 error.
-                        if(n_cpO3_v2 > 0.0)  {FillHisto(h_v2_CPO3_Pos  ,n_cpO3_v2  ,evt_weight_);}
-                        else                 {FillHisto(h_v2_CPO3_Neg  ,n_cpO3_v2  ,evt_weight_);}
-                        FillHisto(h_v2_CPO3_bfReco          ,n_cpO3_v2  ,evt_weight_);
-                        FillHisto(h_v2_CPO3_bfReco_ReRange  ,n_cpO3_v2  ,evt_weight_);
-                     }//end dR requirement
+                     // check dR values final_dR_jet_AnLep is the same as min_dR_jet_AnLep and index is the same as min_index_jet_AnLep
+                     double final_dR_jet_AnLep = v2_pair_Jet->DeltaR((*((TLorentzVector*)AnLep)));
+                     if(min_dR_jet_AnLep != final_dR_jet_AnLep)
+                     {cout << "Jet & AnLep: after pairing: min_index_jet_AnLep = " << min_index_jet_AnLep << ", min_dR_jet_AnLep = " << min_dR_jet_AnLep << ", final_dR_jet_AnLep = " << final_dR_jet_AnLep << ", Jet1 pt = " << v2_pair_Jet->Pt() << endl;}
+                     FillHisto(h_v2_pair_Jet_dR_AnLep        ,final_dR_jet_AnLep    ,evt_weight_);
+                     FillHisto(h_v2_pair_Jet_idx             ,min_index_jet_AnLep    ,evt_weight_);
+
+                     FillHisto(h_v2_pair_Jetpt              ,v2_pair_Jet->Pt()      ,evt_weight_);
+                     FillHisto(h_v2_pair_Jeteta             ,v2_pair_Jet->Eta()     ,evt_weight_);
+                     FillHisto(h_v2_pair_Jetphi             ,v2_pair_Jet->Phi()     ,evt_weight_);
+                     FillHisto(h_v2_pair_AnLeppt            ,v2_pair_AnLep->Pt()    ,evt_weight_);
+                     FillHisto(h_v2_pair_AnLepeta           ,v2_pair_AnLep->Eta()   ,evt_weight_);
+                     FillHisto(h_v2_pair_AnLepphi           ,v2_pair_AnLep->Phi()   ,evt_weight_);
+                  }
+                  // AnJet & Lep
+                  if(min_index_jet_Lep != -1 && v2_pair_AnJet != nullptr && v2_pair_Lep)
+                  {
+                     v2_pair_AnJet = v_jet_TL[min_index_jet_Lep];
+                     v2_pair_Lep = Lep;
+                     // check dR values final_dR_jet_Lep is the same as min_dR_jet_Lep and index is the same as min_index_jet_Lep
+                     double final_dR_jet_Lep = v2_pair_AnJet->DeltaR((*((TLorentzVector*)Lep)));
+                     if(min_dR_jet_Lep != final_dR_jet_Lep)
+                     {cout << "AnJet & Lep: after pairing: min_index_jet_Lep = " << min_index_jet_Lep << ", min_dR_jet_Lep = " << min_dR_jet_Lep << ", final_dR_jet_Lep = " << final_dR_jet_Lep << ", Jet2 pt = " << v2_pair_AnJet->Pt() << endl;}
+                     FillHisto(h_v2_pair_AnJet_dR_Lep       ,final_dR_jet_Lep      ,evt_weight_);
+                     FillHisto(h_v2_pair_AnJet_idx          ,min_index_jet_Lep      ,evt_weight_);
+
+                     FillHisto(h_v2_pair_AnJetpt            ,v2_pair_AnJet->Pt()    ,evt_weight_);
+                     FillHisto(h_v2_pair_AnJeteta           ,v2_pair_AnJet->Eta()   ,evt_weight_);
+                     FillHisto(h_v2_pair_AnJetphi           ,v2_pair_AnJet->Phi()   ,evt_weight_);
+                     FillHisto(h_v2_pair_Leppt              ,v2_pair_Lep->Pt()      ,evt_weight_);
+                     FillHisto(h_v2_pair_Lepeta             ,v2_pair_Lep->Eta()     ,evt_weight_);
+                     FillHisto(h_v2_pair_Lepphi             ,v2_pair_Lep->Phi()     ,evt_weight_);
+                  }
+                  // index &invariant mass & O3 calculation
+                  if( (min_index_jet_AnLep != -1 && v2_pair_Jet != nullptr && v2_pair_AnLep) ||
+                      (min_index_jet_Lep != -1 && v2_pair_AnJet != nullptr && v2_pair_Lep) )
+                  {
+                     // distribution for index of Jet and AnJet
+                     FillHisto(h_v2_pair_Jet_AnJet_idx         ,min_index_jet_Lep     ,min_index_jet_AnLep  ,evt_weight_);
+                     FillHisto(h_v2_pair_comp_Jet_pairbJet     ,v2_pair_Jet->Pt()     ,pair_bJet->Pt()      ,evt_weight_); //v2_pair_Jet & pair_bJet are matched AnMu
+                     FillHisto(h_v2_pair_comp_AnJet_pairAnbJet ,v2_pair_AnJet->Pt()   ,pair_AnbJet->Pt()    ,evt_weight_); //v2_pair_AnJet & pair_AnbJet are matched Mu
+                     // invariant mass
+                     FillHisto(h_v2_pair_Jet_AnMu_Mass         ,( (*v2_pair_Jet)+(*v2_pair_AnLep) ).M()     ,evt_weight_ );
+                     FillHisto(h_v2_pair_AnJet_Mu_Mass         ,( (*v2_pair_AnJet)+(*v2_pair_Lep) ).M()     ,evt_weight_ );
+                     FillHisto(h_v2_pair_Jet_AnbJet_Mass   ,( (*v2_pair_Jet)+(*v2_pair_AnJet) ).M()     ,( (*pair_bJet)+(*pair_AnbJet) ).M()   ,evt_weight_ );
+                     //cout << "Reco O3 v2" << endl;
+                     //cout << "Jet1: " << (*v2_pair_Jet).M() << ", Jet2: " << (*v2_pair_AnJet).M() << ", Lep: " << (*v2_pair_Lep).M() << ", AnLep: " << (*v2_pair_AnLep).M() << endl;
+                     //cout << "Jet1-AnLep: " << ( (*v2_pair_Jet)+(*v2_pair_AnLep) ).M() << ", Jet2-Lep: " << ( (*v2_pair_AnJet)+(*v2_pair_Lep) ).M() << endl;
+                     //cout << "Jet1-Jet2: " << ( (*v2_pair_Jet)+(*v2_pair_AnJet) ).M() << ", pair_bJet-pair_AnbJet: " << ( (*pair_bJet)+(*pair_AnbJet) ).M() << endl;
+                     // calcualte O3
+                     double n_cpO3_v2 = ssbcpviol->getO3Vari( v2_pair_Jet , v2_pair_AnJet, v2_pair_AnLep, v2_pair_Lep );
+                     if(n_cpO3_v2 == 0.0 ){cout << "O3 version2 --00000000000000--" << n_cpO3_v2 << endl;}
+                     // Calculating O3 error.
+                     if(n_cpO3_v2 > 0.0)  {FillHisto(h_v2_CPO3_Pos  ,n_cpO3_v2  ,evt_weight_);}
+                     else                 {FillHisto(h_v2_CPO3_Neg  ,n_cpO3_v2  ,evt_weight_);}
+                     FillHisto(h_v2_CPO3_bfReco          ,n_cpO3_v2  ,evt_weight_);
+                     FillHisto(h_v2_CPO3_bfReco_ReRange  ,n_cpO3_v2  ,evt_weight_);
                   }
 //////////////////////////////////////////////////////////////////// end new algorithm ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3435,8 +3546,6 @@ void ssb_analysis::Loop( char *logfile )
   
    printf("Total processed number of events: %lld\n", __tot_evt);
    cout << "Total Event after duplicated event filtering: " << af_dupleevt << endl;
-
-
 }//end Loop function
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ssb_analysis::GetNtupleTotalEvent( unsigned int totevent )// Not Used Function
@@ -3668,10 +3777,14 @@ void ssb_analysis::DeclareHistos()
       h_pair_AnLepeta[i]   = new TH1D(Form("_h_pair_AnLepeta_%d_",i)   ,Form("AnLep eta after pairing: dR < %s",cutdRName[i].Data())                  ,50     ,-2.5     ,2.5    ); h_pair_AnLepeta[i]->Sumw2();
       h_pair_AnLepphi[i]   = new TH1D(Form("_h_pair_AnLepphi_%d_",i)   ,Form("AnLep phi after pairing: dR < %s",cutdRName[i].Data())                  ,24     ,-1*pi    ,1*pi   ); h_pair_AnLepphi[i]->Sumw2();
       // invariant mass
-      h_pair_b_Anb_Mass[i]    = new TH1D(Form("_h_pair_b_Anb_Mass_%d_",i)    ,Form("b & Anti-b Invariant Mass after pairing: dR < %s",cutdRName[i].Data())   , 1000, 0.0, 1000); h_pair_b_Anb_Mass[i]->Sumw2();
-      h_pair_Mu_AnMu_Mass[i]  = new TH1D(Form("_h_pair_Mu_AnMu_Mass_%d_",i)  ,Form("Mu & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data()) , 1000, 0.0, 1000); h_pair_Mu_AnMu_Mass[i]->Sumw2();
-      h_pair_b_AnMu_Mass[i]   = new TH1D(Form("_h_pair_b_AnMu_Mass_%d_",i)   ,Form("b & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  , 1000, 0.0, 1000); h_pair_b_AnMu_Mass[i]->Sumw2();
-      h_pair_Anb_Mu_Mass[i]   = new TH1D(Form("_h_pair_Anb_Mu_Mass_%d_",i)   ,Form("Anti-b & Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  , 1000, 0.0, 1000); h_pair_Anb_Mu_Mass[i]->Sumw2();
+      h_pair_b_Anb_Mass[i]    = new TH1D(Form("_h_pair_b_Anb_Mass_%d_",i)    ,Form("b & Anti-b Invariant Mass after pairing: dR < %s",cutdRName[i].Data())   ,1000   ,0.0      ,1000   ); h_pair_b_Anb_Mass[i]->Sumw2();
+      h_pair_Mu_AnMu_Mass[i]  = new TH1D(Form("_h_pair_Mu_AnMu_Mass_%d_",i)  ,Form("Mu & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data()) ,1000   ,0.0      ,1000   ); h_pair_Mu_AnMu_Mass[i]->Sumw2();
+      h_pair_b_AnMu_Mass[i]   = new TH1D(Form("_h_pair_b_AnMu_Mass_%d_",i)   ,Form("b & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  ,1000   ,0.0      ,1000   ); h_pair_b_AnMu_Mass[i]->Sumw2();
+      h_pair_Anb_Mu_Mass[i]   = new TH1D(Form("_h_pair_Anb_Mu_Mass_%d_",i)   ,Form("Anti-b & Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  ,1000   ,0.0      ,1000   ); h_pair_Anb_Mu_Mass[i]->Sumw2();
+      h_pair_bJet_Mass[i]     = new TH1D(Form("_h_pair_bJet_Mass_%d_",i)     ,Form("b tagging jet(bJet) Mass after pairing: dR < %s",cutdRName[i].Data())      ,1000   ,0        ,1000   ); h_pair_bJet_Mass[i]->Sumw2();
+      h_pair_AnbJet_Mass[i]   = new TH1D(Form("_h_pair_AnbJet_Mass_%d_",i)   ,Form("b tagging jet(AnbJet) Mass after pairing: dR < %s",cutdRName[i].Data())   ,1000   ,0        ,1000   ); h_pair_AnbJet_Mass[i]->Sumw2();
+      h_pair_Lep_Mass[i]      = new TH1D(Form("_h_pair_Lep_Mass_%d_",i)      ,Form("Lep Mass after pairing: dR < %s",cutdRName[i].Data())                      ,1000   ,0        ,1000   ); h_pair_Lep_Mass[i]->Sumw2();
+      h_pair_AnLep_Mass[i]    = new TH1D(Form("_h_pair_AnLep_Mass_%d_",i)    ,Form("AnLep Mass after pairing: dR < %s",cutdRName[i].Data())                    ,1000   ,0        ,1000   ); h_pair_AnLep_Mass[i]->Sumw2();
       // O3 before top reconstruction
       h_CPO3_bfReco[i]           = new TH1D(Form("_h_CPO3_bfReco_%d_",i)           , Form(""), 200   , -10    , 10);   h_CPO3_bfReco[i]->Sumw2();
       h_CPO3_bfReco_ReRange[i]   = new TH1D(Form("_h_CPO3_bfReco_ReRange_%d_",i)   , Form(""), 40    , -2     , 2);    h_CPO3_bfReco_ReRange[i]->Sumw2();
@@ -3717,6 +3830,10 @@ void ssb_analysis::DeclareHistos()
    h_pair_Gen_Mu_AnMu_Mass  = new TH1D(Form("_h_pair_Gen_Mu_AnMu_Mass_")  ,Form("Gen: Mu & Anti-Mu Invariant Mass after pairing") , 1000, 0.0, 1000); h_pair_Gen_Mu_AnMu_Mass->Sumw2();
    h_pair_Gen_b_AnMu_Mass   = new TH1D(Form("_h_pair_Gen_b_AnMu_Mass_")   ,Form("Gen: b & Anti-Mu Invariant Mass after pairing")  , 1000, 0.0, 1000); h_pair_Gen_b_AnMu_Mass->Sumw2();
    h_pair_Gen_Anb_Mu_Mass   = new TH1D(Form("_h_pair_Gen_Anb_Mu_Mass_")   ,Form("Gen: Anti-b & Mu Invariant Mass after pairing")  , 1000, 0.0, 1000); h_pair_Gen_Anb_Mu_Mass->Sumw2();
+   h_pair_Gen_b_Mass        = new TH1D(Form("_h_pair_Gen_b_Mass_")        ,Form("Gen: b Invariant Mass after pairing")            , 1000, 0.0, 1000); h_pair_Gen_b_Mass->Sumw2();
+   h_pair_Gen_Anb_Mass      = new TH1D(Form("_h_pair_Gen_Anb_Mass_")      ,Form("Gen: Anti-b Invariant Mass after pairing")       , 1000, 0.0, 1000); h_pair_Gen_Anb_Mass->Sumw2();
+   h_pair_Gen_Mu_Mass       = new TH1D(Form("_h_pair_Gen_Mu_Mass_")       ,Form("Gen: Mu Invariant Mass after pairing")           , 1000, 0.0, 1000); h_pair_Gen_Mu_Mass->Sumw2();
+   h_pair_Gen_AnMu_Mass     = new TH1D(Form("_h_pair_Gen_AnMu_Mass_")     ,Form("Gen: Anti-Mu Invariant Mass after pairing")      , 1000, 0.0, 1000); h_pair_Gen_AnMu_Mass->Sumw2();
    // O3 before top reconstruction
    h_GenCPO3_bfReco           = new TH1D(Form("_h_GenCPO3_bfReco_")           , Form(""), 200   , -10    , 10);   h_GenCPO3_bfReco->Sumw2();
    h_GenCPO3_bfReco_ReRange   = new TH1D(Form("_h_GenCPO3_bfReco_ReRange_")   , Form(""), 40    , -2     , 2);    h_GenCPO3_bfReco_ReRange->Sumw2();
@@ -3724,41 +3841,58 @@ void ssb_analysis::DeclareHistos()
    h_GenCPO3_Neg              = new TH1D(Form("_h_GenCPO3_Neg_")              , Form(""), 200   , -10    , 10);   h_GenCPO3_Neg->Sumw2();
 
    ///// O3 version 2 /////
-   // distribution for index of jet1, jet2
-   h_v2_Jet1_idx              = new TH1D("_h_v2_Jet1_idx_"           ,"Dist for idx of Jet1"       , 10, 0, 10); h_v2_Jet1_idx->Sumw2();
-   h_v2_Jet2_idx              = new TH1D("_h_v2_Jet2_idx_"           ,"Dist for idx of Jet2"       , 10, 0, 10); h_v2_Jet2_idx->Sumw2();
-   h_v2_Jet12_idx             = new TH2D("_h_v2_Jet12_idx_"          ,"idx scatter: Jet1 & Jet2"   , 10, 0, 10, 10, 0, 10); h_v2_Jet12_idx->Sumw2();
-   h_comp_Jet1_pairbJet       = new TH2D("_h_comp_Jet1_pairbJet_"    ,"comparison for v1 & v2"     , 10, 0, 10, 10, 0, 10); h_comp_Jet1_pairbJet->Sumw2();
-   h_comp_Jet2_pairAnbJet     = new TH2D("_h_comp_Jet2_pairAnbJet_"  ,"comparison for v1 & v2"     , 10, 0, 10, 10, 0, 10); h_comp_Jet2_pairAnbJet->Sumw2();
+   ////////////////////////
+   // before pairing     //
+   ////////////////////////
+   h_AllJet_idx            = new TH1D(Form("_h_AllJet_idx_")     ,Form("Dist for idx of Jet2 after pairing")       ,10      ,0        ,10);   h_AllJet_idx->Sumw2();
+   h_AllJet_pt             = new TH1D(Form("_h_AllJet_pt_")      ,Form("Jet1 pT when dR is minimum after pairing") ,1000    ,0        ,1000); h_AllJet_pt->Sumw2();
+   h_AllJet_eta            = new TH1D(Form("_h_AllJet_eta_")     ,Form("Jet1 eta when dR is minimum")              ,50      ,-2.5     ,2.5 ); h_AllJet_eta->Sumw2();
+   h_AllJet_phi            = new TH1D(Form("_h_AllJet_phi_")     ,Form("Jet1 phi when dR is minimum")              ,24      ,-1*pi    ,1*pi); h_AllJet_phi->Sumw2();
+   ////////////////////////////////
+   // calculate dR with all jets //
+   ////////////////////////////////
    // all of dR distribution
-   h_v2_dR_Jet1_AnLep         = new TH1D("_h_v2_dR_Jet1_AnLep_"    ,"dR value btw Jet1 & AnLep"    , 100, 0, 10); h_v2_dR_Jet1_AnLep->Sumw2();
-   h_v2_dR_Jet2_Lep           = new TH1D("_h_v2_dR_Jet2_Lep_"      ,"dR value btw Jet2 & Lep"      , 100, 0, 10); h_v2_dR_Jet2_Lep->Sumw2();
-   h_v2_dR_Jet1_Jet2          = new TH2D("_h_v2_dR_Jet1_Jet2_"     ,"delta R value scatter: (Jet1 & AnLep) & (Jet2 & Lep)", 100, 0, 10, 100, 0, 10); h_v2_dR_Jet1_Jet2->Sumw2();
-   // when dR is mimimum
-   h_v2_dR_Min_Jet1_AnLep     = new TH1D("_h_v2_dR_Min_Jet1_AnLep_"     ,"min delta R btw Jet1 & AnLep"        , 100, 0, 10); h_v2_dR_Min_Jet1_AnLep->Sumw2();
-   h_v2_dR_Min_Jet2_Lep       = new TH1D("_h_v2_dR_Min_Jet2_Lep_"       ,"min delta R btw Jet2 & Lep"          , 100, 0, 10); h_v2_dR_Min_Jet2_Lep->Sumw2();
-   h_v2_dR_Min_Jet1_Jet2      = new TH2D("_h_v2_dR_Min_Jet1_Jet2_"      ,"min delta R value scatter: (Jet1 & AnLep) & (Jet2 & Lep)", 100, 0, 10, 100, 0, 10); h_v2_dR_Min_Jet1_Jet2->Sumw2();
-   // kinematics
-   h_v2_pair_Jet1pt        = new TH1D(Form("_h_v2_pair_Jet1pt_")        ,Form(" Jet1 pT when dR is minimum")      ,1000   ,0        ,1000   ); h_v2_pair_Jet1pt->Sumw2();
-   h_v2_pair_Jet1eta       = new TH1D(Form("_h_v2_pair_Jet1eta_")       ,Form(" Jet1 eta when dR is minimum")     ,50     ,-2.5     ,2.5    ); h_v2_pair_Jet1eta->Sumw2();
-   h_v2_pair_Jet1phi       = new TH1D(Form("_h_v2_pair_Jet1phi_")       ,Form(" Jet1 phi when dR is minimum")     ,24     ,-1*pi    ,1*pi   ); h_v2_pair_Jet1phi->Sumw2();
-   h_v2_pair_Jet2pt        = new TH1D(Form("_h_v2_pair_Jet2pt_")        ,Form(" Jet2 pT when dR is minimum")      ,1000   ,0        ,1000   ); h_v2_pair_Jet2pt->Sumw2();
-   h_v2_pair_Jet2eta       = new TH1D(Form("_h_v2_pair_Jet2eta_")       ,Form(" Jet2 eta when dR is minimum")     ,50     ,-2.5     ,2.5    ); h_v2_pair_Jet2eta->Sumw2();
-   h_v2_pair_Jet2phi       = new TH1D(Form("_h_v2_pair_Jet2phi_")       ,Form(" Jet2 phi when dR is minimum")     ,24     ,-1*pi    ,1*pi   ); h_v2_pair_Jet2phi->Sumw2();
-   h_v2_pair_Leppt         = new TH1D(Form("_h_v2_pair_Leppt_")         ,Form(" Lep pT when dR is minimum")       ,1000   ,0        ,1000   ); h_v2_pair_Leppt->Sumw2();
-   h_v2_pair_Lepeta        = new TH1D(Form("_h_v2_pair_Lepeta_")        ,Form(" Lep eta when dR is minimum")      ,50     ,-2.5     ,2.5    ); h_v2_pair_Lepeta->Sumw2();
-   h_v2_pair_Lepphi        = new TH1D(Form("_h_v2_pair_Lepphi_")        ,Form(" Lep phi when dR is minimum")      ,24     ,-1*pi    ,1*pi   ); h_v2_pair_Lepphi->Sumw2();
-   h_v2_pair_AnLeppt       = new TH1D(Form("_h_v2_pair_AnLeppt_")       ,Form(" AnLep pT when dR is minimum")     ,1000   ,0        ,1000   ); h_v2_pair_AnLeppt->Sumw2();
-   h_v2_pair_AnLepeta      = new TH1D(Form("_h_v2_pair_AnLepeta_")      ,Form(" AnLep eta when dR is minimum")    ,50     ,-2.5     ,2.5    ); h_v2_pair_AnLepeta->Sumw2();
-   h_v2_pair_AnLepphi      = new TH1D(Form("_h_v2_pair_AnLepphi_")      ,Form(" AnLep phi when dR is minimum")    ,24     ,-1*pi    ,1*pi   ); h_v2_pair_AnLepphi->Sumw2();
+   h_v2_dR_AnLep           = new TH1D(Form("_h_v2_dR_AnLep_")    ,Form("dR value btw all Jets & AnLep")                          ,100  ,0 ,10);                h_v2_dR_AnLep->Sumw2();
+   h_v2_dR_Lep             = new TH1D(Form("_h_v2_dR_Lep_")      ,Form("dR value btw all Jets & Lep")                            ,100  ,0 ,10);                h_v2_dR_Lep->Sumw2();
+   h_v2_dR_Lep_AnLep       = new TH2D(Form("_h_v2_dR_Lep_AnLep_"),Form("delta R value scatter: (Jet1 & AnLep) & (Jet2 & Lep)")   ,100  ,0 ,10   ,100  ,0 ,10); h_v2_dR_Lep_AnLep->Sumw2();
+   // find minimum dR
+   h_v2_dR_Min_Lep         = new TH1D(Form("_h_v2_dR_Min_AnJet_Lep_")   ,Form("min delta R btw AnJet & Lep")                              ,100  ,0 ,10);                h_v2_dR_Min_Lep->Sumw2();
+   h_v2_dR_Min_AnLep       = new TH1D(Form("_h_v2_dR_Min_Jet_AnLep_")   ,Form("min delta R btw Jet & AnLep")                              ,100  ,0 ,10);                h_v2_dR_Min_AnLep->Sumw2();
+   h_v2_dR_Min_Lep_AnLep   = new TH2D(Form("_h_v2_dR_Min_Jet_AnJet_")   ,Form("min delta R value scatter: (Jet & AnLep) & (AnJet & Lep)") ,100  ,0 ,10   ,100  ,0 ,10); h_v2_dR_Min_Lep_AnLep->Sumw2();
+   ///////////////////////
+   // after pairing     //
+   ///////////////////////
+   // Jet & AnLep //
+   h_v2_pair_Jet_dR_AnLep       = new TH1D(Form("_h_v2_pair_dR_Jet_AnLep_")      ,Form("dR value btw Jet & AnLep")                  ,100     ,0        ,10);   h_v2_pair_Jet_dR_AnLep->Sumw2();
+   h_v2_pair_Jet_idx            = new TH1D(Form("_h_v2_pair_Jet_idx_")           ,Form("Dist for idx of Jet after pairing")         ,10      ,0        ,10);   h_v2_pair_Jet_idx->Sumw2();
+   h_v2_pair_Jetpt              = new TH1D(Form("_h_v2_pair_Jetpt_")             ,Form("Jet pT when dR is minimum after pairing")   ,1000    ,0        ,1000); h_v2_pair_Jetpt->Sumw2();
+   h_v2_pair_Jeteta             = new TH1D(Form("_h_v2_pair_Jeteta_")            ,Form("Jet eta when dR is minimum")                ,50      ,-2.5     ,2.5 ); h_v2_pair_Jeteta->Sumw2();
+   h_v2_pair_Jetphi             = new TH1D(Form("_h_v2_pair_Jetphi_")            ,Form("Jet phi when dR is minimum")                ,24      ,-1*pi    ,1*pi); h_v2_pair_Jetphi->Sumw2();
+   h_v2_pair_AnLeppt            = new TH1D(Form("_h_v2_pair_AnLeppt_")           ,Form("AnLep pT when dR is minimum")               ,1000    ,0        ,1000); h_v2_pair_AnLeppt->Sumw2();
+   h_v2_pair_AnLepeta           = new TH1D(Form("_h_v2_pair_AnLepeta_")          ,Form("AnLep eta when dR is minimum")              ,50      ,-2.5     ,2.5 ); h_v2_pair_AnLepeta->Sumw2();
+   h_v2_pair_AnLepphi           = new TH1D(Form("_h_v2_pair_AnLepphi_")          ,Form("AnLep phi when dR is minimum")              ,24      ,-1*pi    ,1*pi); h_v2_pair_AnLepphi->Sumw2();
+   // AnJet & Lep //
+   h_v2_pair_AnJet_dR_Lep       = new TH1D(Form("_h_v2_pair_dR_AnJet_Lep_")      ,Form("dR value btw AnJet & Lep")                  ,100     ,0        ,10);   h_v2_pair_AnJet_dR_Lep->Sumw2();
+   h_v2_pair_AnJet_idx          = new TH1D(Form("_h_v2_pair_AnJet_idx_")         ,Form("Dist for idx of AnJet after pairing")       ,10      ,0        ,10);   h_v2_pair_AnJet_idx->Sumw2();
+   h_v2_pair_AnJetpt            = new TH1D(Form("_h_v2_pair_AnJetpt_")           ,Form("AnJet pT when dR is minimum")               ,1000    ,0        ,1000); h_v2_pair_AnJetpt->Sumw2();
+   h_v2_pair_AnJeteta           = new TH1D(Form("_h_v2_pair_AnJeteta_")          ,Form("AnJet eta when dR is minimum")              ,50      ,-2.5     ,2.5 ); h_v2_pair_AnJeteta->Sumw2();
+   h_v2_pair_AnJetphi           = new TH1D(Form("_h_v2_pair_AnJetphi_")          ,Form("AnJet phi when dR is minimum")              ,24      ,-1*pi    ,1*pi); h_v2_pair_AnJetphi->Sumw2();
+   h_v2_pair_Leppt              = new TH1D(Form("_h_v2_pair_Leppt_")             ,Form("Lep pT when dR is minimum")                 ,1000    ,0        ,1000); h_v2_pair_Leppt->Sumw2();
+   h_v2_pair_Lepeta             = new TH1D(Form("_h_v2_pair_Lepeta_")            ,Form("Lep eta when dR is minimum")                ,50      ,-2.5     ,2.5 ); h_v2_pair_Lepeta->Sumw2();
+   h_v2_pair_Lepphi             = new TH1D(Form("_h_v2_pair_Lepphi_")            ,Form("Lep phi when dR is minimum")                ,24      ,-1*pi    ,1*pi); h_v2_pair_Lepphi->Sumw2();
+   // distribution of idx
+   h_v2_pair_Jet_AnJet_idx          = new TH2D(Form("_h_v2_pair_Jet_AnJet_idx_")          ,Form("idx scatter: Jet & AnJet after pairing")       ,10      ,0        ,10     ,10   ,0 ,10);    h_v2_pair_Jet_AnJet_idx->Sumw2();
+   h_v2_pair_comp_Jet_pairbJet      = new TH2D(Form("_h_v2_pair_comp_Jet_pairbJet_")      ,Form("comparison for v1 & v2 Jet after pairing")     ,1000    ,0        ,1000   ,1000 ,0 ,1000);  h_v2_pair_comp_Jet_pairbJet->Sumw2();
+   h_v2_pair_comp_AnJet_pairAnbJet  = new TH2D(Form("_h_v2_pair_comp_AnJet_pairAnbJet_")  ,Form("comparison for v1 & v2 AnJet after pairing")   ,1000    ,0        ,1000   ,1000 ,0 ,1000);  h_v2_pair_comp_AnJet_pairAnbJet->Sumw2();
    // invariant mass
-   h_v2_Jet1_AnMu_Mass     = new TH1D(Form("_h_v2_Jet1_AnMu_Mass_")     ,Form(" Jet1 & AnLep Invariant Mass when minimum dR")    , 1000, 0.0, 1000); h_v2_Jet1_AnMu_Mass->Sumw2();
-   h_v2_Jet2_Mu_Mass       = new TH1D(Form("_h_v2_Jet2_Mu_Mass_")       ,Form(" Jet2 & Lep Invariant Mass when minimum dR")      , 1000, 0.0, 1000); h_v2_Jet2_Mu_Mass->Sumw2();
+   h_v2_pair_Jet_AnMu_Mass       = new TH1D(Form("_h_v2_pair_Jet_AnMu_Mass_")    ,Form("Jet & AnLep Invariant Mass when minimum dR")     ,1000 ,0.0  ,1000);                                         h_v2_pair_Jet_AnMu_Mass->Sumw2();
+   h_v2_pair_AnJet_Mu_Mass       = new TH1D(Form("_h_v2_pair_AnJet_Mu_Mass_")    ,Form("AnJet & Lep Invariant Mass when minimum dR")       ,1000 ,0.0  ,1000);                                         h_v2_pair_AnJet_Mu_Mass->Sumw2();
+   h_v2_pair_Jet_AnbJet_Mass     = new TH2D(Form("_h_v2_pair_Jet_AnbJet_Mass_")  ,Form("Jet+AnJet & pair_bJet+pair_AnbJet Invariant Mass when minimum dR")      , 1000, 0.0, 1000, 1000, 0.0, 1000);  h_v2_pair_Jet_AnbJet_Mass->Sumw2();
    // O3
-   h_v2_CPO3_bfReco           = new TH1D(Form("_h_v2_CPO3_bfReco_")           , Form(""), 200   , -10    , 10);   h_v2_CPO3_bfReco->Sumw2();
-   h_v2_CPO3_bfReco_ReRange   = new TH1D(Form("_h_v2_CPO3_bfReco_ReRange_")   , Form(""), 40    , -2     , 2);    h_v2_CPO3_bfReco_ReRange->Sumw2();
-   h_v2_CPO3_Pos              = new TH1D(Form("_h_v2_CPO3_Pos_")              , Form(""), 200   , -10    , 10);   h_v2_CPO3_Pos->Sumw2();
-   h_v2_CPO3_Neg              = new TH1D(Form("_h_v2_CPO3_Neg_")              , Form(""), 200   , -10    , 10);   h_v2_CPO3_Neg->Sumw2();
+   h_v2_CPO3_bfReco              = new TH1D(Form("_h_v2_CPO3_bfReco_")              , Form(""), 200   , -10    , 10);   h_v2_CPO3_bfReco->Sumw2();
+   h_v2_CPO3_bfReco_ReRange      = new TH1D(Form("_h_v2_CPO3_bfReco_ReRange_"), Form(""), 40    , -2     , 2);    h_v2_CPO3_bfReco_ReRange->Sumw2();
+   h_v2_CPO3_Pos                 = new TH1D(Form("_h_v2_CPO3_Pos_")           , Form(""), 200   , -10    , 10);   h_v2_CPO3_Pos->Sumw2();
+   h_v2_CPO3_Neg                 = new TH1D(Form("_h_v2_CPO3_Neg_")           , Form(""), 200   , -10    , 10);   h_v2_CPO3_Neg->Sumw2();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    /////////////////////////////
