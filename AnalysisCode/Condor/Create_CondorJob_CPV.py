@@ -3,12 +3,12 @@ import sys
 
 samplelist = [
     ["TTJets_Signal_dtG_0","30"],
-    #["TTJets_Signal_dtG_0p5207","31"],
-    #["TTJets_Signal_dtG_1p0415","30"],
-    #["TTJets_Signal_dtG_2p60364","30"],
-    #["TTJets_Signal_dtG_m0p5207","31"],
-    #["TTJets_Signal_dtG_m1p0415","30"],
-    #["TTJets_Signal_dtG_m2p60364","30"]
+    ["TTJets_Signal_dtG_0p5207","31"],
+    ["TTJets_Signal_dtG_1p0415","30"],
+    ["TTJets_Signal_dtG_2p60364","30"],
+    ["TTJets_Signal_dtG_m0p5207","31"],
+    ["TTJets_Signal_dtG_m1p0415","30"],
+    ["TTJets_Signal_dtG_m2p60364","30"]
 ]
 jobversion = "Job_Version/v6_O3v2_3/CPV_Sample"
 

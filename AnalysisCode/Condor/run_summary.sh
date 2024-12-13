@@ -34,12 +34,12 @@ samplelist=(
     #"ZZ" 
     ### CPV samples ### 
     "TTJets_Signal_dtG_0" 
-    #"TTJets_Signal_dtG_0p5207" 
-    #"TTJets_Signal_dtG_1p0415" 
-    #"TTJets_Signal_dtG_2p60364" 
-    #"TTJets_Signal_dtG_m0p5207" 
-    #"TTJets_Signal_dtG_m1p0415" 
-    #"TTJets_Signal_dtG_m2p60364" 
+    "TTJets_Signal_dtG_0p5207" 
+    "TTJets_Signal_dtG_1p0415" 
+    "TTJets_Signal_dtG_2p60364" 
+    "TTJets_Signal_dtG_m0p5207" 
+    "TTJets_Signal_dtG_m1p0415" 
+    "TTJets_Signal_dtG_m2p60364" 
 )
 ######################################################################
 ### before running, should change samples you want to make summary ###
@@ -135,6 +135,7 @@ do
             # exit-code 확인 : exit-code 0(정상종료)이 아니면 기록
             if ! grep -q "exit-code 0" "$log_path/log_$j.log"; then
                 echo "Log: " >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"
+                echo "`grep "SlotName" "$log_path/log_$j.log"`" >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"
                 echo "`grep "exit-code" "$log_path/log_$j.log"`" >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"
                 echo "`grep " Memory (MB)" "$log_path/log_$j.log"`" >> "./Run_Summary/${sample_path}/${i}/Run_Summary_${i}.txt"""
             fi
