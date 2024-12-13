@@ -4,8 +4,8 @@ import os
 ##### get current path #####
 print(os.getcwd())
 ##### define source file path #####
-Jobversion = "v6_O3v2_2"
-originPath = f"/u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/output/{Jobversion}/Dataset"
+version = "v6_O3v2_3"
+originPath = f"/u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/output/Job_Version/{version}/Dataset"
 ##### hadd list #####
 samplelist = [
     "Data_DoubleMuon_Run2016B","Data_DoubleMuon_Run2016C","Data_DoubleMuon_Run2016D","Data_DoubleMuon_Run2016E","Data_DoubleMuon_Run2016F","Data_DoubleMuon_Run2016G","Data_DoubleMuon_Run2016HV2","Data_DoubleMuon_Run2016HV3", #0~7
