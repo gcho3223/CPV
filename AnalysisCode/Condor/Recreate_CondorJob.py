@@ -75,7 +75,13 @@ for sample in range(len(samplelist)):
     with open(f"{sample_dir}/recondor_sub.sub", "w") as file:
         file.write("universe = vanilla \n")
         file.write("executable = condor_run.sh \n\n")
-        file.write("request_memory = 3072 MB \n") ##data: 6144, MC: 3072, CPV: 2048
+        ## set up memory request: data: 6144, MC: 3072, CPV: 2048
+        if "Data" in samplelist[sample][0]:
+            file.write("request_memory = 6144 MB \n\n") ## data samples
+        elif "dtG" in samplelist[sample][0]:
+            file.write("request_memory = 2048 MB \n\n") ## CPV samples
+        else:
+            file.write("request_memory = 3072 MB \n\n") ## MC samples
         file.write("should_transfer_files = YES \n")
         file.write("when_to_transfer_output = ON_EXIT \n\n")
         file.write('Requirements = (machine =!= "cluster291.knu.ac.kr") && (TARGET.Arch == "X86_64") && (TARGET.OpSys == "LINUX") && (TARGET.HasFileTransfer)\n')

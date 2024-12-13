@@ -2,22 +2,22 @@ import os
 import sys
 
 samplelist = [
-    #["Data_DoubleMuon_Run2016B","264"],
-    #["Data_DoubleMuon_Run2016C","87"],
-    #["Data_DoubleMuon_Run2016D","146"],
-    #["Data_DoubleMuon_Run2016E","124"],
-    #["Data_DoubleMuon_Run2016F","91"],
-    #["Data_DoubleMuon_Run2016G","214"],
-    #["Data_DoubleMuon_Run2016HV2","232"],
-    #["Data_DoubleMuon_Run2016HV3","7"],
-    #["Data_SingleMuon_Run2016B","1054"],
-    #["Data_SingleMuon_Run2016C","348"],
-    #["Data_SingleMuon_Run2016D","584"],
-    #["Data_SingleMuon_Run2016E","496"],
-    #["Data_SingleMuon_Run2016F","362"],
-    #["Data_SingleMuon_Run2016G","854"],
-    #["Data_SingleMuon_Run2016HV2","925"],
-    #["Data_SingleMuon_Run2016HV3","25"],
+    ["Data_DoubleMuon_Run2016B","264"],
+    ["Data_DoubleMuon_Run2016C","87"],
+    ["Data_DoubleMuon_Run2016D","146"],
+    ["Data_DoubleMuon_Run2016E","124"],
+    ["Data_DoubleMuon_Run2016F","91"],
+    ["Data_DoubleMuon_Run2016G","214"],
+    ["Data_DoubleMuon_Run2016HV2","232"],
+    ["Data_DoubleMuon_Run2016HV3","7"],
+    ["Data_SingleMuon_Run2016B","1054"],
+    ["Data_SingleMuon_Run2016C","348"],
+    ["Data_SingleMuon_Run2016D","584"],
+    ["Data_SingleMuon_Run2016E","496"],
+    ["Data_SingleMuon_Run2016F","362"],
+    ["Data_SingleMuon_Run2016G","854"],
+    ["Data_SingleMuon_Run2016HV2","925"],
+    ["Data_SingleMuon_Run2016HV3","25"],
     ["DYJetsToLL_M_10To50","178"],
     ["DYJetsToLL_M_50","732"],
     ["ST_tW_antitop","70"],
@@ -27,7 +27,7 @@ samplelist = [
     ["TTbar_ZQQ","4"],
     ["TTbar_ZToLLNuNu","56"],
     ["TTJets_others","621"],
-    #["TTJets_Signal","621"],
+    ["TTJets_Signal","621"],
     ["WJetsToLNu","120"],
     ["WW","81"],
     ["WZ","41"],
@@ -42,7 +42,7 @@ samplelist = [
     ["TTJets_Signal_dtG_m2p60364","30"]
 ]
 
-version = "v6_O3v2_4"
+version = "v6_O3v2_3"
 
 
 for sample in range(len(samplelist)):
@@ -83,7 +83,13 @@ for sample in range(len(samplelist)):
         file.write("universe = vanilla \n")
         file.write("executable = condor_run.sh \n\n")
         file.write("arguments = $(Process) \n")
-        file.write("request_memory = 6144 MB \n\n") #data: 6144, MC: 3072
+        ## set up memory request: data: 6144, MC: 3072, CPV: 2048
+        if "Data" in samplelist[sample][0]:
+            file.write("request_memory = 6144 MB \n\n") ## data samples
+        elif "dtG" in samplelist[sample][0]:
+            file.write("request_memory = 2048 MB \n\n") ## CPV samples
+        else:
+            file.write("request_memory = 3072 MB \n\n") ## MC samples
         file.write("should_transfer_files = YES \n")
         file.write("when_to_transfer_output = ON_EXIT \n\n")
         file.write("output = /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/Condor/%s/%s/log_condor/out/out_$(Process).out \n" %(jobversion, samplelist[sample][0]) )
