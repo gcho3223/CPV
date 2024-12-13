@@ -806,10 +806,6 @@ class ssb_analysis : public SSBTree
       TH1D *h_pair_Mu_AnMu_Mass[6];
       TH1D *h_pair_b_AnMu_Mass[6];
       TH1D *h_pair_Anb_Mu_Mass[6];
-      TH1D *h_pair_bJet_Mass[6];
-      TH1D *h_pair_AnbJet_Mass[6];
-      TH1D *h_pair_Lep_Mass[6];
-      TH1D *h_pair_AnLep_Mass[6];
       // calcuate O3
       TH1D *h_CPO3_bfReco[6];
       TH1D *h_CPO3_bfReco_ReRange[6];

@@ -3781,10 +3781,6 @@ void ssb_analysis::DeclareHistos()
       h_pair_Mu_AnMu_Mass[i]  = new TH1D(Form("_h_pair_Mu_AnMu_Mass_%d_",i)  ,Form("Mu & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data()) ,1000   ,0.0      ,1000   ); h_pair_Mu_AnMu_Mass[i]->Sumw2();
       h_pair_b_AnMu_Mass[i]   = new TH1D(Form("_h_pair_b_AnMu_Mass_%d_",i)   ,Form("b & Anti-Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  ,1000   ,0.0      ,1000   ); h_pair_b_AnMu_Mass[i]->Sumw2();
       h_pair_Anb_Mu_Mass[i]   = new TH1D(Form("_h_pair_Anb_Mu_Mass_%d_",i)   ,Form("Anti-b & Mu Invariant Mass after pairing: dR < %s",cutdRName[i].Data())  ,1000   ,0.0      ,1000   ); h_pair_Anb_Mu_Mass[i]->Sumw2();
-      h_pair_bJet_Mass[i]     = new TH1D(Form("_h_pair_bJet_Mass_%d_",i)     ,Form("b tagging jet(bJet) Mass after pairing: dR < %s",cutdRName[i].Data())      ,1000   ,0        ,1000   ); h_pair_bJet_Mass[i]->Sumw2();
-      h_pair_AnbJet_Mass[i]   = new TH1D(Form("_h_pair_AnbJet_Mass_%d_",i)   ,Form("b tagging jet(AnbJet) Mass after pairing: dR < %s",cutdRName[i].Data())   ,1000   ,0        ,1000   ); h_pair_AnbJet_Mass[i]->Sumw2();
-      h_pair_Lep_Mass[i]      = new TH1D(Form("_h_pair_Lep_Mass_%d_",i)      ,Form("Lep Mass after pairing: dR < %s",cutdRName[i].Data())                      ,1000   ,0        ,1000   ); h_pair_Lep_Mass[i]->Sumw2();
-      h_pair_AnLep_Mass[i]    = new TH1D(Form("_h_pair_AnLep_Mass_%d_",i)    ,Form("AnLep Mass after pairing: dR < %s",cutdRName[i].Data())                    ,1000   ,0        ,1000   ); h_pair_AnLep_Mass[i]->Sumw2();
       // O3 before top reconstruction
       h_CPO3_bfReco[i]           = new TH1D(Form("_h_CPO3_bfReco_%d_",i)           , Form(""), 200   , -10    , 10);   h_CPO3_bfReco[i]->Sumw2();
       h_CPO3_bfReco_ReRange[i]   = new TH1D(Form("_h_CPO3_bfReco_ReRange_%d_",i)   , Form(""), 40    , -2     , 2);    h_CPO3_bfReco_ReRange[i]->Sumw2();
@@ -3813,18 +3809,18 @@ void ssb_analysis::DeclareHistos()
    h_Gen_dR3_pair_GenAnb_GenLep   = new TH1D("_h_Gen_dR3_pair_GenAnb_GenLep_"   , "delta R btw Gen anti-b & muon"                   , 100, 0, 10); h_Gen_dR3_pair_GenAnb_GenLep->Sumw2();
    h_Gen_dR3_af_Genb_GenAnb  = new TH2D("_h_Gen_dR3_af_Genb_GenAnb_"  , "delta R value scatter: (b & anti-muon) & (anti-b & muon)"  , 100, 0, 10, 100, 0, 10); h_Gen_dR3_af_Genb_GenAnb->Sumw2();
    // when dR is under 3
-   h_Pair_Genbpt       = new TH1D(Form("_h_Pair_Genbpt_%d")       ,Form("Gen b quark pT after pairing")           ,1000   ,0        ,1000   ); h_Pair_Genbpt->Sumw2();
-   h_Pair_Genbeta      = new TH1D(Form("_h_Pair_Genbeta_%d")      ,Form("Gen b quark eta after pairing")          ,50     ,-2.5     ,2.5    ); h_Pair_Genbeta->Sumw2();
-   h_Pair_Genbphi      = new TH1D(Form("_h_Pair_Genbphi_%d")      ,Form("Gen b quark phi after pairing")          ,24     ,-1*pi    ,1*pi   ); h_Pair_Genbphi->Sumw2();
-   h_Pair_GenAnbpt     = new TH1D(Form("_h_Pair_GenAnbpt_%d")     ,Form("Gen anti-b quark pT after pairing")      ,1000   ,0        ,1000   ); h_Pair_GenAnbpt->Sumw2();
-   h_Pair_GenAnbeta    = new TH1D(Form("_h_Pair_GenAnbeta_%d")    ,Form("Gen anti-b quark eta after pairing")     ,50     ,-2.5     ,2.5    ); h_Pair_GenAnbeta->Sumw2();
-   h_Pair_GenAnbphi    = new TH1D(Form("_h_Pair_GenAnbphi_%d")    ,Form("Gen anti-b quark phi after pairing")     ,24     ,-1*pi    ,1*pi   ); h_Pair_GenAnbphi->Sumw2();
-   h_pair_GenMupt      = new TH1D(Form("_h_pair_GenMupt_%d")      ,Form("Gen muon pT after pairing")              ,1000   ,0        ,1000   ); h_pair_GenMupt->Sumw2();
-   h_pair_GenMueta     = new TH1D(Form("_h_pair_GenMueta_%d")     ,Form("Gen muon eta after pairing")             ,50     ,-2.5     ,2.5    ); h_pair_GenMueta->Sumw2();
-   h_pair_GenMuphi     = new TH1D(Form("_h_pair_GenMuphi_%d")     ,Form("Gen muon phi after pairing")             ,24     ,-1*pi    ,1*pi   ); h_pair_GenMuphi->Sumw2();
-   h_pair_GenAnMupt    = new TH1D(Form("_h_pair_GenAnMupt_%d")    ,Form("Gen anti-muon quark pT after pairing")   ,1000   ,0        ,1000   ); h_pair_GenAnMupt->Sumw2();
-   h_pair_GenAnMueta   = new TH1D(Form("_h_pair_GenAnMueta_%d")   ,Form("Gen anti-muon quark eta after pairing")  ,50     ,-2.5     ,2.5    ); h_pair_GenAnMueta->Sumw2();
-   h_pair_GenAnMuphi   = new TH1D(Form("_h_pair_GenAnMuphi_%d")   ,Form("Gen anti-muon quark phi after pairing")  ,24     ,-1*pi    ,1*pi   ); h_pair_GenAnMuphi->Sumw2();
+   h_Pair_Genbpt       = new TH1D(Form("_h_Pair_Genbpt_")       ,Form("Gen b quark pT after pairing")           ,1000   ,0        ,1000   ); h_Pair_Genbpt->Sumw2();
+   h_Pair_Genbeta      = new TH1D(Form("_h_Pair_Genbeta_")      ,Form("Gen b quark eta after pairing")          ,50     ,-2.5     ,2.5    ); h_Pair_Genbeta->Sumw2();
+   h_Pair_Genbphi      = new TH1D(Form("_h_Pair_Genbphi_")      ,Form("Gen b quark phi after pairing")          ,24     ,-1*pi    ,1*pi   ); h_Pair_Genbphi->Sumw2();
+   h_Pair_GenAnbpt     = new TH1D(Form("_h_Pair_GenAnbpt_")     ,Form("Gen anti-b quark pT after pairing")      ,1000   ,0        ,1000   ); h_Pair_GenAnbpt->Sumw2();
+   h_Pair_GenAnbeta    = new TH1D(Form("_h_Pair_GenAnbeta_")    ,Form("Gen anti-b quark eta after pairing")     ,50     ,-2.5     ,2.5    ); h_Pair_GenAnbeta->Sumw2();
+   h_Pair_GenAnbphi    = new TH1D(Form("_h_Pair_GenAnbphi_")    ,Form("Gen anti-b quark phi after pairing")     ,24     ,-1*pi    ,1*pi   ); h_Pair_GenAnbphi->Sumw2();
+   h_pair_GenMupt      = new TH1D(Form("_h_pair_GenMupt_")      ,Form("Gen muon pT after pairing")              ,1000   ,0        ,1000   ); h_pair_GenMupt->Sumw2();
+   h_pair_GenMueta     = new TH1D(Form("_h_pair_GenMueta_")     ,Form("Gen muon eta after pairing")             ,50     ,-2.5     ,2.5    ); h_pair_GenMueta->Sumw2();
+   h_pair_GenMuphi     = new TH1D(Form("_h_pair_GenMuphi_")     ,Form("Gen muon phi after pairing")             ,24     ,-1*pi    ,1*pi   ); h_pair_GenMuphi->Sumw2();
+   h_pair_GenAnMupt    = new TH1D(Form("_h_pair_GenAnMupt_")    ,Form("Gen anti-muon quark pT after pairing")   ,1000   ,0        ,1000   ); h_pair_GenAnMupt->Sumw2();
+   h_pair_GenAnMueta   = new TH1D(Form("_h_pair_GenAnMueta_")   ,Form("Gen anti-muon quark eta after pairing")  ,50     ,-2.5     ,2.5    ); h_pair_GenAnMueta->Sumw2();
+   h_pair_GenAnMuphi   = new TH1D(Form("_h_pair_GenAnMuphi_")   ,Form("Gen anti-muon quark phi after pairing")  ,24     ,-1*pi    ,1*pi   ); h_pair_GenAnMuphi->Sumw2();
    // invariant mass
    h_pair_Gen_b_Anb_Mass    = new TH1D(Form("_h_pair_Gen_b_Anb_Mass_")    ,Form("Gen: b & Anti-b Invariant Mass after pairing")   , 1000, 0.0, 1000); h_pair_Gen_b_Anb_Mass->Sumw2();
    h_pair_Gen_Mu_AnMu_Mass  = new TH1D(Form("_h_pair_Gen_Mu_AnMu_Mass_")  ,Form("Gen: Mu & Anti-Mu Invariant Mass after pairing") , 1000, 0.0, 1000); h_pair_Gen_Mu_AnMu_Mass->Sumw2();
