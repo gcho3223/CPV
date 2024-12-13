@@ -26,20 +26,20 @@ samplelist=(
     #"TTbar_WQQ" 
     #"TTbar_ZQQ" 
     #"TTbar_ZToLLNuNu" 
-    #"TTJets_others" 
+    "TTJets_others" 
     #"TTJets_Signal" 
     #"WJetsToLNu" 
     #"WW" 
     #"WZ" 
     #"ZZ" 
     ### CPV samples ### 
-    "TTJets_Signal_dtG_0" 
-    "TTJets_Signal_dtG_0p5207" 
-    "TTJets_Signal_dtG_1p0415" 
-    "TTJets_Signal_dtG_2p60364" 
-    "TTJets_Signal_dtG_m0p5207" 
-    "TTJets_Signal_dtG_m1p0415" 
-    "TTJets_Signal_dtG_m2p60364" 
+    #"TTJets_Signal_dtG_0" 
+    #"TTJets_Signal_dtG_0p5207" 
+    #"TTJets_Signal_dtG_1p0415" 
+    #"TTJets_Signal_dtG_2p60364" 
+    #"TTJets_Signal_dtG_m0p5207" 
+    #"TTJets_Signal_dtG_m1p0415" 
+    #"TTJets_Signal_dtG_m2p60364" 
 )
 ######################################################################
 ### before running, should change samples you want to make summary ###
