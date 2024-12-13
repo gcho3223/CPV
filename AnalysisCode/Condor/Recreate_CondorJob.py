@@ -42,10 +42,15 @@ samplelist = [
     #["TTJets_Signal_dtG_m2p60364",["3","8","12","19","20","25"]]
 ]
 
-#jobversion = "Job_Version/v6_O3v2_3/CPV_Sample"
-jobversion = "Job_Version/v6_O3v2_3/Dataset"
+jobversion = "v6_O3v2_3"
 
 for sample in range(len(samplelist)):
+    ### set up jobversion ###
+    if "dtG" in samplelist[sample][0]:
+        jobversion = "Job_Version/%s/CPV_Sample" %(version)
+    else:
+        jobversion = "Job_Version/%s/Dataset" %(version)
+    ### set up directory ###
     sample_dir = f"{jobversion}/{samplelist[sample][0]}"
     ### delete log, err, out files for the failed jobs in log_condor directory ###
     for f in os.listdir(f"{sample_dir}/log_condor/err"):
