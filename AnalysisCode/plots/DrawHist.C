@@ -1,3 +1,19 @@
+//////////////////////////////////////////////////////////////////////////////////
+//	DrawHist.C Description														//
+//	root -l -b -q DrawHist.C'("version","opt")									//
+//	opt: cpv or data															//
+//  	cpv: draw histogram for CPV samples										//
+//  	data: draw histogram for data samples									//
+//	* histogram *																//
+//	1D: dR, pT, eta, phi, invariant mass, O3									//
+//	2D: dR, idx, mass															//
+//	** 3 cases **																//
+//	1) new algorithm v1(use b-tagging jet for matching)							//
+//		draw histogram for dR(0.5, 1.0, 1.5, 2.0, 2.5, 3.0)						//
+//	2) Gen level																//
+//	3) new algorithm v2(use all jet for matching)								//
+//	*** also O3 asymmetry parameters are written in text file for each samples	//
+//////////////////////////////////////////////////////////////////////////////////
 #include "TSystem.h"
 #include "TH1.h"
 #include "TLegend.h"
@@ -17,6 +33,10 @@ struct CPVari
     double f_m_ = 0.;
     double num_total_ = 0.;
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//	iscpv = "cpv" or "data"					   													//
+//	data option include MC and data(data_doublemuon, data_singlemuon, DY, ST, TTV, Diboson, Data)	//
+//////////////////////////////////////////////////////////////////////////////////////////////////
 void DrawHist(string version, string iscpv)
 {
 	void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv);
@@ -26,28 +46,35 @@ void DrawHist(string version, string iscpv)
 
 	/// text file ///
 	//gSystem->mkdir(Form("./%s/text",version.c_str()),kTRUE);
-    ofstream outtxt(Form("./%s/Asymmetry_dimu_SystematicStudy_v23.dat",version.c_str()));
+	ofstream outtxt;
+    if(iscpv == "cpv") {outtxt.open(Form("./%s/Asymmetry_dimu_CPV.dat", version.c_str()));}
+	else if(iscpv == "data") {outtxt.open(Form("./%s/Asymmetry_dimu_SystematicStudy_v26_O3v2_.dat", version.c_str()));}
     //ofstream outtxt(Form("./%s/AsymParas_repro_V1.dat",version.c_str()));
     ofstream &fout = outtxt;
-	// fout << "Luminosity:  " << 35.9 / pow(10., -15.) << endl;
+	fout << "Luminosity:  35867.059983" << endl << endl;
 	/// delta R ratio ///
 	ofstream outtxt3D(Form("%s/Dist_DeltaR_Ratio.txt",version.c_str()));
     ofstream &fout3d = outtxt3D;
 
 	vector<string> sample;
-	if(iscpv == "cpv") {sample = {"TTJets_Signal_dtG_m2p60364","TTJets_Signal_dtG_m1p0415","TTJets_Signal_dtG_m0p5207","TTJets_Signal_dtG_0","TTJets_Signal_dtG_0p5207","TTJets_Signal_dtG_1p0415","TTJets_Signal_dtG_2p60364"};}
-	else
+	if(iscpv == "cpv") {sample = {
+		//"TTJets_Signal_dtG_m2p60364","TTJets_Signal_dtG_m1p0415","TTJets_Signal_dtG_m0p5207",
+		"TTJets_Signal_dtG_0",
+		//"TTJets_Signal_dtG_0p5207","TTJets_Signal_dtG_1p0415","TTJets_Signal_dtG_2p60364"
+		};
+	}
+	else if(iscpv == "data")
 	{
 		sample = {
-			//"Data_DoubleMuon_Run2016B","Data_DoubleMuon_Run2016C","Data_DoubleMuon_Run2016D","Data_DoubleMuon_Run2016E","Data_DoubleMuon_Run2016F","Data_DoubleMuon_Run2016G","Data_DoubleMuon_Run2016HV2","Data_DoubleMuon_Run2016HV3",
-			//"Data_SingleMuon_Run2016B","Data_SingleMuon_Run2016C","Data_SingleMuon_Run2016D","Data_SingleMuon_Run2016E","Data_SingleMuon_Run2016F","Data_SingleMuon_Run2016G","Data_SingleMuon_Run2016HV2","Data_SingleMuon_Run2016HV3", // ~15
-			//"DYJetsToLL_M_10To50","DYJetsToLL_M_50", //16~
-			//"ST_tW_antitop","ST_tW_top",
+			"Data_DoubleMuon_Run2016B","Data_DoubleMuon_Run2016C","Data_DoubleMuon_Run2016D","Data_DoubleMuon_Run2016E","Data_DoubleMuon_Run2016F","Data_DoubleMuon_Run2016G","Data_DoubleMuon_Run2016HV2","Data_DoubleMuon_Run2016HV3",
+			"Data_SingleMuon_Run2016B","Data_SingleMuon_Run2016C","Data_SingleMuon_Run2016D","Data_SingleMuon_Run2016E","Data_SingleMuon_Run2016F","Data_SingleMuon_Run2016G","Data_SingleMuon_Run2016HV2","Data_SingleMuon_Run2016HV3", // ~15
+			"DYJetsToLL_M_10To50","DYJetsToLL_M_50", //16~
+			"ST_tW_antitop","ST_tW_top",
 			"TTJets_Signal",
-			//"TTJets_others",
-			//"TTbar_WJetToLNu","TTbar_WQQ","TTbar_ZQQ","TTbar_ZToLLNuNu",
-			//"WW","WZ","ZZ","WJetsToLNu", //~30
-			//"Data_DoubleMuon","Data_SingleMuon","DY","ST","TTV","Diboson","Data"
+			"TTJets_others",
+			"TTbar_WJetToLNu","TTbar_WQQ","TTbar_ZQQ","TTbar_ZToLLNuNu",
+			"WW","WZ","ZZ","WJetsToLNu", //~30
+			"Data_DoubleMuon","Data_SingleMuon","DY","ST","TTV","Diboson","Data"
 		};
 	}
 
@@ -55,11 +82,11 @@ void DrawHist(string version, string iscpv)
 	{
 		TString ffile;
 		/// file read ///
-		if(iscpv == "cpv") {ffile = Form("../output/%s/CPV_Sample/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
-		else
+		if(iscpv == "cpv") {ffile = Form("../output/Job_Version/%s/CPV_Sample/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
+		else if(iscpv == "data")
 		{
-			if(isn < 30) {ffile = Form("../output/%s/Dataset/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
-			else {ffile = Form("../output/%s/Dataset/%s/%s.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
+			if(isn < 30) {ffile = Form("../output/Job_Version/%s/Dataset/%s/%s_All.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
+			else {ffile = Form("../output/Job_Version/%s/Dataset/%s/%s.root",version.c_str(),sample[isn].c_str(),sample[isn].c_str());}
 		}
 		TFile *f = new TFile(ffile,"READ");
 		if(f==NULL){cout << "Something Wrong!!" << endl;}
@@ -96,11 +123,16 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 	string savepath;
 	if(iscpv == "cpv")
 	{
-		if(hname.Contains("Gen")) {savepath = Form("./%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
-		else if(hname.Contains("v2")) {savepath = Form("./%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
-		else {savepath = Form("./%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
+		if(hname.Contains("Gen")) {savepath = Form("./Job_Version/%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./Job_Version/%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
+		else {savepath = Form("./Job_Version/%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
 	}
-	else {savepath = Form("./%s/Dataset/%s",version.c_str(),sample.c_str());}
+	else if(iscpv == "data")
+	{
+		if(hname.Contains("Gen")) {savepath = Form("./Job_Version/%s/Dataset/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./Job_Version/%s/Dataset/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
+		else {savepath = Form("./Job_Version/%s/Dataset/%s/Reco",version.c_str(),sample.c_str());}
+	}
 	gSystem->mkdir(Form("%s/",savepath.c_str()),kTRUE);
 
 	/// canvas ///
@@ -136,11 +168,16 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		h_obj->GetXaxis()->SetTitle("#phi");
 		DrawOverflowBin(h_obj, -3.2, 3.2);
 	}
+	/// invariant mass ///
 	if(hname.Contains("Mass"))
 	{
-		h_obj->Rebin(10);
+		h_obj->Rebin(5);
 		h_obj->GetXaxis()->SetTitle("Invariant Mass (GeV)");
 		DrawOverflowBin(h_obj, 0, 300);
+	}
+	if(hname.Contains("idx"))
+	{
+		h_obj->GetXaxis()->SetTitle("Index");
 	}
 	/// O3 ///
 	if(hname.Contains("O3"))
@@ -181,21 +218,28 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		leg->AddEntry(h_obj, Form("A: %.4f",tmp.asym_),"");
 		leg->Draw();
 
-		if(sample == "DYJetsToLL_M_10To50" || sample == "DYJetsToLL_M_50" || sample == "Data" || sample == "ST_tW_antitop" || sample == "ST_tW_top" || sample == "TTJets_others" || sample == "TTJets_Signal" ||
-		sample == "TTbar_WJetToLNu" || sample == "TTbar_WQQ" || sample == "TTbar_ZQQ" || sample == "TTbar_ZToLLNuNu" || sample == "WW" || sample == "WZ" || sample == "ZZ")
+		if( ( iscpv == "cpv" && (hname.Contains("_h_GenCPO3_bfReco_") || hname.Contains("_h_CPO3_bfReco_5_") || hname.Contains("_h_v2_CPO3_bfReco_")) ) || 
+			( iscpv == "data" && ( hname.Contains("_h_v2_CPO3_bfReco_") && 
+		   		(sample == "DYJetsToLL_M_10To50" || sample == "DYJetsToLL_M_50" || sample == "Data" || 
+		    	sample == "ST_tW_antitop" || sample == "ST_tW_top" || sample == "TTJets_others" || 
+		    	sample == "TTJets_Signal" || sample == "TTbar_WJetToLNu" || sample == "TTbar_WQQ" || 
+		    	sample == "TTbar_ZQQ" || sample == "TTbar_ZToLLNuNu" || sample == "WW" || 
+		    	sample == "WZ" || sample == "ZZ") )
+			)
+		)
 		{
-			fout << Form("dimu_hO3_4%s_asym: %.6f",sample.c_str(), tmp.asym_) << endl;
-			fout << Form("dimu_hO3_4%s_asym_err: 0",sample.c_str()) << endl;
-    		fout << Form("dimu_hO3_4%s_Nplus: %.6f",sample.c_str(), tmp.num_p_) << endl;
-    		fout << Form("dimu_hO3_4%s_Nplus_err: 0",sample.c_str()) << endl;
-    		fout << Form("dimu_hO3_4%s_fplus: 0",sample.c_str()) << endl;
-    		fout << Form("dimu_hO3_4%s_Nminus: %.6f",sample.c_str(), tmp.num_m_) << endl;
-    		fout << Form("dimu_hO3_4%s_Nminus_err: 0",sample.c_str()) << endl;
-    		fout << Form("dimu_hO3_4%s_fminus: 0",sample.c_str()) << endl;
-    		fout << Form("dimu_hO3_4%s_total: %.6f",sample.c_str(),tmp.num_total_) << endl;
-    		fout << endl;
+			if(iscpv =="cpv") {fout << Form("<<<<<< %s >>>>>>",hname.Data()) << endl;}
+			fout << Form("dimu_hO3_4%s_asym: %.6f"			,sample.c_str(), tmp.asym_) << endl;
+			fout << Form("dimu_hO3_4%s_asym_err: %.6f"		,sample.c_str(), tmp.asym_err_) << endl;
+			fout << Form("dimu_hO3_4%s_Nplus: %.6f"			,sample.c_str(), tmp.num_p_) << endl;
+			fout << Form("dimu_hO3_4%s_Nplus_err: %.6f"		,sample.c_str(), tmp.num_p_err_) << endl;
+			fout << Form("dimu_hO3_4%s_fplus: %.6f"			,sample.c_str(), tmp.f_p_) << endl;
+			fout << Form("dimu_hO3_4%s_Nminus: %.6f"		,sample.c_str(), tmp.num_m_) << endl;
+			fout << Form("dimu_hO3_4%s_Nminus_err: %.6f"	,sample.c_str(), tmp.num_m_err_) << endl;
+			fout << Form("dimu_hO3_4%s_fminus: %.6f"		,sample.c_str(), tmp.f_m_) << endl;
+			fout << Form("dimu_hO3_4%s_total: %.6f"			,sample.c_str(), tmp.num_total_) << endl;
+			fout << endl;
 		}
-		//c->SaveAs(Form("%s/%s_1.pdf",savepath.c_str(),h_obj->GetName()));
 		DrawOverflowBin(h_obj, -2, 2);
 	}
 
@@ -231,11 +275,23 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 	c->SetMargin(0.12,0.12,0.12,0.12);
 	h_obj2D->Draw("colz");
 	h_obj2D->SetTitle("");
-	h_obj2D->GetXaxis()->SetRangeUser(0,10);
-	h_obj2D->GetYaxis()->SetRangeUser(0,10);
+	/// invariant mass ///
+	if(hname.Contains("comp") || hname.Contains("Mass"))
+	{
+		h_obj2D->RebinX(10);
+		h_obj2D->RebinY(10);
+		h_obj2D->GetXaxis()->SetRangeUser(0,1000);
+		h_obj2D->GetYaxis()->SetRangeUser(0,1000);
+	}
+	if(hname.Contains("dR") || hname.Contains("idx"))
+	{
+		h_obj2D->GetXaxis()->SetRangeUser(0,10);
+		h_obj2D->GetYaxis()->SetRangeUser(0,10);
+	}
+	
 	h_obj2D->GetYaxis()->SetTitleOffset(1.5);
-	h_obj2D->GetXaxis()->SetTitle("#DeltaR_{b jet}");
-	h_obj2D->GetYaxis()->SetTitle("#DeltaR_{#bar{b} jet}");
+	//h_obj2D->GetXaxis()->SetTitle("#DeltaR_{b jet}");
+	//h_obj2D->GetYaxis()->SetTitle("#DeltaR_{#bar{b} jet}");
 
 	// check the number of deltaR>3, deltaR<3
 	double deltaR_under3 = h_obj2D->Integral(5,30,5,30);
@@ -260,11 +316,16 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 	string savepath;
 	if(iscpv == "cpv")
 	{
-		if(hname.Contains("Gen")){savepath = Form("./%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
-		else if(hname.Contains("v2")) {savepath = Form("./%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
-		else {savepath = Form("./%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
+		if(hname.Contains("Gen")){savepath = Form("./Job_Version/%s/CPV_Sample/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./Job_Version/%s/CPV_Sample/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
+		else {savepath = Form("./Job_Version/%s/CPV_Sample/%s/Reco",version.c_str(),sample.c_str());}
 	}
-	else {savepath = Form("./%s/%s",version.c_str(),sample.c_str());}
+	else if(iscpv == "data")
+	{
+		if(hname.Contains("Gen")){savepath = Form("./Job_Version/%s/Dataset/%s/Gen",version.c_str(),sample.c_str());}
+		else if(hname.Contains("v2")) {savepath = Form("./Job_Version/%s/Dataset/%s/Reco/O3_v2",version.c_str(),sample.c_str());}
+		else {savepath = Form("./Job_Version/%s/Dataset/%s/Reco",version.c_str(),sample.c_str());}
+	}
 	// save canvas
 	for(int i=0; i<dR_idx.size(); i++)
 	{
