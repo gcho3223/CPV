@@ -4,21 +4,21 @@ import os
 ##### get current path #####
 print(os.getcwd())
 ##### define source file path #####
-Jobversion = "v5_InvtMass_dR"
+Jobversion = "v6_O3v2_2"
 originPath = f"/u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/output/{Jobversion}/Dataset"
 ##### hadd list #####
 samplelist = [
     "Data_DoubleMuon_Run2016B","Data_DoubleMuon_Run2016C","Data_DoubleMuon_Run2016D","Data_DoubleMuon_Run2016E","Data_DoubleMuon_Run2016F","Data_DoubleMuon_Run2016G","Data_DoubleMuon_Run2016HV2","Data_DoubleMuon_Run2016HV3", #0~7
     "Data_SingleMuon_Run2016B","Data_SingleMuon_Run2016C","Data_SingleMuon_Run2016D","Data_SingleMuon_Run2016E","Data_SingleMuon_Run2016F","Data_SingleMuon_Run2016G","Data_SingleMuon_Run2016HV2","Data_SingleMuon_Run2016HV3", #8~15
-    #"DYJetsToLL_M_10To50","DYJetsToLL_M_50", #DY 16~17
-    #"ST_tW_antitop","ST_tW_top", #ST 18~19
-    #"TTbar_WJetToLNu","TTbar_WQQ","TTbar_ZQQ","TTbar_ZToLLNuNu", #tt+V 20~24
-    #"TTJets_others",#"TTJets_Signal", #25, 26
-    #"WJetsToLNu","WW","WZ","ZZ", #Diboson 27~29
+    "DYJetsToLL_M_10To50","DYJetsToLL_M_50",                        #DY 16~17
+    "ST_tW_antitop","ST_tW_top",                                    #ST 18~19
+    "TTbar_WJetToLNu","TTbar_WQQ","TTbar_ZQQ","TTbar_ZToLLNuNu",    #tt+V 20~24
+    "TTJets_others",                                                #25
+    "WJetsToLNu","WW","WZ","ZZ",                                    #Diboson 27~29
 ]
 cmbname = [
     "Data_DoubleMuon","Data_SingleMuon",
-    #"DY","ST","TTV","Diboson"
+    "DY","ST","TTV","Diboson"
 ]
 
 #################################
