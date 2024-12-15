@@ -58,6 +58,7 @@ for sample in range(len(samplelist)):
     ### create log_condor directory ###
     os.makedirs(f"{sample_dir}/log_condor/err", exist_ok=True)
     os.makedirs(f"{sample_dir}/log_condor/log", exist_ok=True) 
+    os.makedirs(f"{sample_dir}/log_condor/log_msg", exist_ok=True) 
     os.makedirs(f"{sample_dir}/log_condor/out", exist_ok=True)
     ### delete log_condor directory ###
     for f in os.listdir(f"{sample_dir}/log_condor/err"):
@@ -77,7 +78,10 @@ for sample in range(len(samplelist)):
         file.write("cd /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/ \n")
         file.write("cmsenv \n\n")
         file.write("mkdir -p ./output/%s/\n" %(sample_dir))
-        file.write("./ssb_analysis %s/%s_${fileListNum}.list /%s/%s_${fileListNum}.root 0 %s \n" % (samplelist[sample][0],samplelist[sample][0],sample_dir,samplelist[sample][0],samplelist[sample][0]))
+        if "dtG" in samplelist[sample][0]:
+            file.write("./ssb_analysis CEDM_Sample/%s/%s_${fileListNum}.list /%s/%s_${fileListNum}.root 0 %s \n" % (samplelist[sample][0],samplelist[sample][0],sample_dir,samplelist[sample][0],samplelist[sample][0]))
+        else:
+            file.write("./ssb_analysis %s/%s_${fileListNum}.list /%s/%s_${fileListNum}.root 0 %s \n" % (samplelist[sample][0],samplelist[sample][0],sample_dir,samplelist[sample][0],samplelist[sample][0]))
     ### created submit condor job: condor_sub.sub ###
     with open(f"{sample_dir}/condor_sub.sub", "w") as file:
         file.write("universe = vanilla \n")
