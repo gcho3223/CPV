@@ -58,7 +58,6 @@ for sample in range(len(samplelist)):
     ### create log_condor directory ###
     os.makedirs(f"{sample_dir}/log_condor/err", exist_ok=True)
     os.makedirs(f"{sample_dir}/log_condor/log", exist_ok=True) 
-    os.makedirs(f"{sample_dir}/log_condor/log_msg", exist_ok=True) 
     os.makedirs(f"{sample_dir}/log_condor/out", exist_ok=True)
     ### delete log_condor directory ###
     for f in os.listdir(f"{sample_dir}/log_condor/err"):
