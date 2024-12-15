@@ -45,9 +45,9 @@ void LinearityObs(string version, string opt)
 
     ///// canvas save /////
     string savepath;
-    if(opt == "reco") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Reco",version.c_str());}
+    if(opt == "recov1") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Reco",version.c_str());}
     else if(opt == "gen") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Gen",version.c_str());}
-    else if(opt == "v2") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Reco/O3_v2",version.c_str());}
+    else if(opt == "recov2") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Reco/O3_v2",version.c_str());}
     else if(opt == "ref") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Ref",version.c_str());}
     
 	gSystem->mkdir(Form("%s/",savepath.c_str()),kTRUE);
@@ -60,9 +60,9 @@ void LinearityObs(string version, string opt)
 
     vector<string> vdtG = {"dtG_m2p60364","dtG_m1p0415","dtG_m0p5207","dtG_0","dtG_0p5207","dtG_1p0415","dtG_2p60364"};
     vector<string> vCPO3;
-    if(opt == "reco") {vCPO3 = {"_h_CPO3_bfReco_0_","_h_CPO3_bfReco_1_","_h_CPO3_bfReco_2_","_h_CPO3_bfReco_3_","_h_CPO3_bfReco_4_","_h_CPO3_bfReco_5_"};}
+    if(opt == "recov1") {vCPO3 = {"_h_CPO3_bfReco_0_","_h_CPO3_bfReco_1_","_h_CPO3_bfReco_2_","_h_CPO3_bfReco_3_","_h_CPO3_bfReco_4_","_h_CPO3_bfReco_5_"};}
     else if(opt == "gen") {vCPO3 = {"_h_GenCPO3_bfReco_"};}
-    else if(opt == "v2") {vCPO3 = {"_h_v2_CPO3_bfReco_"};}
+    else if(opt == "recov2") {vCPO3 = {"_h_v2_CPO3_bfReco_"};}
     else if(opt == "ref") {vCPO3 = {"h_Reco_CPO3"};}
 
     vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0"};
@@ -73,31 +73,27 @@ void LinearityObs(string version, string opt)
     Double_t vdtG_Xval[7] = {-2.60364,-1.0415,-0.5207,0,0.5207,1.0415,2.60364};
     Double_t vdtG_Yval[6][7];
     Double_t vdtG_StatErr[6][7];
-    Double_t vData_Yval = -0.001894;
-    Double_t vData_StatErr = 0.004465;
-
-    //TString ffile_data = Form("../output/%s/Dataset/Data/Data.root",version.c_str());
-    //TFile *fdata = new TFile(ffile_data,"READ");
-    //TH1D *h_CPO3_data = (TH1D*)fdata->Get("_h_CPO3_bfReco_5_");
-    //if(h_CPO3_data==NULL){cout << Form("empty _h_CPO3_bfReco_5_.......") << endl;}
-    //tmp_data = O3Asym(h_CPO3_data, version, savepath, vdtG[6], xsec[6], fout);
-    //vData_Yval = tmp_data.asym_;
-    //vData_StatErr = tmp_data.asym_err_;
+    ///////////////////////////////////////////////
+    // Data+MC O3 Asymmetry using likelihood fit //
+    ///////////////////////////////////////////////
+    Double_t vLike_Yval = 0.00850289;
+    Double_t vLike_StatErr_p = 0.00507752;
+    Double_t vLike_StatErr_m = 0.00507841;
 
     for(int icp=0; icp<vCPO3.size(); icp++)
     {
         for(int idtg=0; idtg<vdtG.size(); idtg++)
         {
-            TString ffile = Form("../output/%s/CPV_Sample/TTJets_Signal_%s/TTJets_Signal_%s_All.root",version.c_str(),vdtG[idtg].c_str(),vdtG[idtg].c_str());
+            TString ffile = Form("../output/Job_Version/%s/CPV_Sample/TTJets_Signal_%s/TTJets_Signal_%s_All.root",version.c_str(),vdtG[idtg].c_str(),vdtG[idtg].c_str());
             TFile *f = new TFile(ffile,"READ");
 		    if(f==NULL){cout << "Something Wrong!!" << endl;} else {cout << ffile.Data() << endl;}        
             TH1D *h_CPO3;
-            if(opt == "reco")
+            if(opt == "recov1")
             {
                 h_CPO3 = (TH1D*)f->Get(Form("%s",vCPO3[icp].c_str()));
                 if(h_CPO3==NULL){cout << Form("empty %s.......",vCPO3[icp].c_str()) << endl;}
             }
-            else if(opt == "gen" || opt == "v2" || opt == "ref")
+            else if(opt == "gen" || opt == "recov2" || opt == "ref")
             {
                 h_CPO3 = (TH1D*)f->Get(Form("%s",vCPO3[0].c_str()));
                 if(h_CPO3==NULL){cout << Form("empty %s.......",vCPO3[0].c_str()) << endl;}
@@ -129,7 +125,7 @@ void LinearityObs(string version, string opt)
         /// fit & fitting band ///
         TF1 *flinear = new TF1("flinear", "pol1", xmin, xmax);
         g_reco->Fit("flinear", "R");
-
+        /// 1σ, 2σ uncertainty band ///
         const int npoint = 100;
         double x[npoint], y[npoint];
         double y1Err[npoint], y2Err[npoint];
@@ -146,21 +142,22 @@ void LinearityObs(string version, string opt)
             y2Err[i] = error2; // 1σ 하한
             //cout << "y: " << y[i] << ", error1: " << error1 << ", error2: " << error2 << ", y1Err: " << y1Err[i] << ", y2Err: " << y2Err[i] << endl;
         }
+        /// uncertainty band setting ///
         TGraph *twoSig = new TGraphErrors(npoint,x,y,0,y2Err);
         twoSig->SetFillColor(kGreen);
         twoSig->SetFillStyle(1001);
         TGraph *oneSig = new TGraphErrors(npoint,x,y,0,y1Err);
         oneSig->SetFillStyle(1001);
         oneSig->SetFillColor(kYellow);
-
+        /// plot setting ///
         g_reco->SetTitle("");
         g_reco->GetXaxis()->SetRangeUser(xmin,xmax);
-        if(opt == "reco" || opt == "v2" || opt == "ref") {g_reco->GetYaxis()->SetRangeUser(-0.08,0.08);}
+        if(opt == "recov1" || opt == "recov2" || opt == "ref") {g_reco->GetYaxis()->SetRangeUser(-0.08,0.08);}
         else if(opt == "gen") {g_reco->GetYaxis()->SetRangeUser(-0.12,0.12);}
         g_reco->GetYaxis()->SetTitleOffset(1.5);
         g_reco->SetMarkerStyle(kFullSquare);
         g_reco->SetMarkerColor(kBlack);
-
+        /// plot add to draw in single canvas ///
         multiGraph->Add(twoSig, "3");
         multiGraph->Add(oneSig, "3");
         multiGraph->Add(g_reco,"P");
@@ -170,25 +167,25 @@ void LinearityObs(string version, string opt)
         multiGraph->GetXaxis()->SetTitleOffset(1.2);
         multiGraph->GetYaxis()->SetTitleOffset(1.5);
         multiGraph->GetXaxis()->SetRangeUser(-2.9,2.9);
-        if(opt == "reco" || opt == "v2" || opt == "ref") {multiGraph->GetYaxis()->SetRangeUser(-0.08,0.08);}
+        if(opt == "recov1" || opt == "recov2" || opt == "ref") {multiGraph->GetYaxis()->SetRangeUser(-0.08,0.08);}
         else if(opt == "gen") {multiGraph->GetYaxis()->SetRangeUser(-0.12,0.12);}
-
-        line = new TLine(xmin, vData_Yval, xmax, vData_Yval);
+        /// add O3 asymmetry value using likelihood fit ///
+        line = new TLine(xmin, vLike_Yval, xmax, vLike_Yval);
         line->SetLineColor(kRed);
         line->Draw("same");
-        TBox *vData_Box = new TBox(vdtG_Xval[0], vData_Yval - vData_StatErr, vdtG_Xval[6], vData_Yval + vData_StatErr);
-        vData_Box->SetFillStyle(1001); // solid로 설정
-        vData_Box->SetFillColorAlpha(kBlue, 0.2); // 20% 반투명하게 설정
-        vData_Box->Draw("same");
-
+        TBox *vLike_Box = new TBox(vdtG_Xval[0], vLike_Yval - vLike_StatErr_m, vdtG_Xval[6], vLike_Yval + vLike_StatErr_p); //x1,y1,x2,y2
+        vLike_Box->SetFillStyle(1001); // solid로 설정
+        vLike_Box->SetFillColorAlpha(kBlue, 0.2); // 20% 반투명하게 설정
+        vLike_Box->Draw("same");
+        /// add text ///
         text.SetNDC();
         text.SetTextSize(0.03);
         text.SetTextFont(42);
         text.DrawLatex(0.2,0.9,Form("#mu^{+}#mu^{-} channel (%s)",opt.c_str()));
-
+        /// add legend ///
         lleg = new TLegend(0.2, 0.65, 0.5, 0.85);
         lleg->AddEntry(line, "Data O_{3} Asymmetry", "l");
-        lleg->AddEntry(vData_Box, "Data O_{3} Asymmetry Stat. Err.", "f");
+        lleg->AddEntry(vLike_Box, "Data O_{3} Asymmetry Stat. Err.", "f");
         lleg->AddEntry(oneSig, "68% expected", "f");
         lleg->AddEntry(twoSig, "95% expected", "f");
         lleg->AddEntry(flinear, Form("slope: %.3f",slope), "");
@@ -196,11 +193,11 @@ void LinearityObs(string version, string opt)
         lleg->SetFillColor(0);
         lleg->SetBorderSize(0);
         lleg->Draw();
-    
+        /// save canvas ///
         clin->Update();
         clin->Modified();
-        if(opt == "reco") {{clin->SaveAs(Form("%s/dR_%s/CPV_Linearity.pdf",savepath.c_str(), dR_values[ilin].c_str()));}}
-        else if(opt == "gen" || opt == "v2" || opt == "ref") {clin->SaveAs(Form("%s/CPV_Linearity.pdf",savepath.c_str()));}
+        if(opt == "recov1") {{clin->SaveAs(Form("%s/dR_%s/CPV_Linearity.pdf",savepath.c_str(), dR_values[ilin].c_str()));}}
+        else if(opt == "gen" || opt == "recov2" || opt == "ref") {clin->SaveAs(Form("%s/CPV_Linearity.pdf",savepath.c_str()));}
 
         delete clin;
     }

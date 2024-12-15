@@ -33,10 +33,10 @@ struct CPVari
     double f_m_ = 0.;
     double num_total_ = 0.;
 };
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//	iscpv = "cpv" or "data"					   													//
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//	iscpv = "cpv" or "data"					   														//
 //	data option include MC and data(data_doublemuon, data_singlemuon, DY, ST, TTV, Diboson, Data)	//
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 void DrawHist(string version, string iscpv)
 {
 	void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv);
@@ -47,8 +47,8 @@ void DrawHist(string version, string iscpv)
 	/// text file ///
 	//gSystem->mkdir(Form("./%s/text",version.c_str()),kTRUE);
 	ofstream outtxt;
-    if(iscpv == "cpv") {outtxt.open(Form("./%s/Asymmetry_dimu_CPV.dat", version.c_str()));}
-	else if(iscpv == "data") {outtxt.open(Form("./%s/Asymmetry_dimu_SystematicStudy_v26_O3v2_.dat", version.c_str()));}
+    if(iscpv == "cpv") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_CPV.dat", version.c_str()));}
+	else if(iscpv == "data") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v27_O3v1.dat", version.c_str()));}
     //ofstream outtxt(Form("./%s/AsymParas_repro_V1.dat",version.c_str()));
     ofstream &fout = outtxt;
 	fout << "Luminosity:  35867.059983" << endl << endl;
@@ -58,9 +58,9 @@ void DrawHist(string version, string iscpv)
 
 	vector<string> sample;
 	if(iscpv == "cpv") {sample = {
-		//"TTJets_Signal_dtG_m2p60364","TTJets_Signal_dtG_m1p0415","TTJets_Signal_dtG_m0p5207",
+		"TTJets_Signal_dtG_m2p60364","TTJets_Signal_dtG_m1p0415","TTJets_Signal_dtG_m0p5207",
 		"TTJets_Signal_dtG_0",
-		//"TTJets_Signal_dtG_0p5207","TTJets_Signal_dtG_1p0415","TTJets_Signal_dtG_2p60364"
+		"TTJets_Signal_dtG_0p5207","TTJets_Signal_dtG_1p0415","TTJets_Signal_dtG_2p60364"
 		};
 	}
 	else if(iscpv == "data")
@@ -219,7 +219,7 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		leg->Draw();
 
 		if( ( iscpv == "cpv" && (hname.Contains("_h_GenCPO3_bfReco_") || hname.Contains("_h_CPO3_bfReco_5_") || hname.Contains("_h_v2_CPO3_bfReco_")) ) || 
-			( iscpv == "data" && ( hname.Contains("_h_v2_CPO3_bfReco_") && 
+			( iscpv == "data" && ( hname.Contains("_h_CPO3_bfReco_5_") && 
 		   		(sample == "DYJetsToLL_M_10To50" || sample == "DYJetsToLL_M_50" || sample == "Data" || 
 		    	sample == "ST_tW_antitop" || sample == "ST_tW_top" || sample == "TTJets_others" || 
 		    	sample == "TTJets_Signal" || sample == "TTbar_WJetToLNu" || sample == "TTbar_WQQ" || 
