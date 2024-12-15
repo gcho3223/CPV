@@ -87,6 +87,8 @@ vector<TString> hist1D =
     ///////////////////
     // distribution for index of Jet and AnJet
     "_h_v2_pair_dR_Jet_AnLep_","_h_v2_pair_dR_AnJet_Lep_",
+    // index
+    "_h_v2_pair_Jet_idx_","_h_v2_pair_AnJet_idx_",
     // kinematics
     "_h_v2_pair_Jetpt_","_h_v2_pair_Jeteta_","_h_v2_pair_Jetphi_","_h_v2_pair_AnJetpt_","_h_v2_pair_AnJeteta_","_h_v2_pair_AnJetphi_",       // kinematics: jet1, jet2
     "_h_v2_pair_AnLeppt_","_h_v2_pair_AnLepeta_","_h_v2_pair_AnLepphi_","_h_v2_pair_Leppt_","_h_v2_pair_Lepeta_","_h_v2_pair_Lepphi_",         // kinematics: Mu, AnMu
