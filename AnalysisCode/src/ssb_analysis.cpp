@@ -1067,7 +1067,7 @@ void ssb_analysis::Loop( char *logfile )
                   // delta R distribution: After pairing
                   FillHisto(h_dR_pair_bJet_AnLep   ,dR_pair_bJet_AnLep                       ,evt_weight_);   //dR distribution b quark & lepton
                   FillHisto(h_dR_pair_AnbJet_Lep   ,dR_pair_AnbJet_Lep                       ,evt_weight_);   //dR distribution b-bar quark & anti-lepton
-                  FillHisto(h_dR_pair_bJet_AnbJet  ,dR_pair_bJet_AnLep ,dR_pair_AnbJet_Lep   ,evt_weight_);
+                  FillHisto(h_dR_pair_bJet_AnbJet  ,dR_pair_AnbJet_Lep ,dR_pair_bJet_AnLep   ,evt_weight_);
 
                   vector<double> v_dR_value = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
                   if(pair_bJet && pair_AnbJet && pair_Lep && pair_AnLep)
@@ -1078,7 +1078,7 @@ void ssb_analysis::Loop( char *logfile )
                         {
                         FillHisto(h_dRNum_pair_bJet_AnLep[idr]  ,dR_pair_bJet_AnLep  ,evt_weight_);
                         FillHisto(h_dRNum_pair_AnbJet_Lep[idr]  ,dR_pair_AnbJet_Lep  ,evt_weight_);
-                        FillHisto(h_dRNum_pair_bJet_AnbJet[idr] ,dR_pair_bJet_AnLep  ,dR_pair_AnbJet_Lep  ,evt_weight_);
+                        FillHisto(h_dRNum_pair_bJet_AnbJet[idr] ,dR_pair_AnbJet_Lep  ,dR_pair_bJet_AnLep  ,evt_weight_);
                         FillHisto(h_Pair_bJetpt[idr]     ,pair_bJet->Pt()    ,evt_weight_);
                         FillHisto(h_Pair_bJeteta[idr]    ,pair_bJet->Eta()   ,evt_weight_);
                         FillHisto(h_Pair_bJetphi[idr]    ,pair_bJet->Phi()   ,evt_weight_);
@@ -1225,12 +1225,12 @@ void ssb_analysis::Loop( char *logfile )
                      Gen_dR_GenAnb_GenLep = GenAnb->DeltaR(*((TLorentzVector*)GenMu));
                      FillHisto(h_Gen_dR_Genb_GenAnLep    ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
                      FillHisto(h_Gen_dR_GenAnb_GenLep    ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
-                     FillHisto(h_Gen_dR_Genb_GenAnb      ,Gen_dR_Genb_GenAnLep  ,Gen_dR_GenAnb_GenLep    ,evt_weight_);
+                     FillHisto(h_Gen_dR_Genb_GenAnb      ,Gen_dR_GenAnb_GenLep  ,Gen_dR_Genb_GenAnLep    ,evt_weight_);
                      if(Gen_dR_Genb_GenAnLep < 3 && Gen_dR_GenAnb_GenLep < 3)
                      {
                         FillHisto(h_Gen_dR3_pair_Genb_GenAnLep ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
                         FillHisto(h_Gen_dR3_pair_GenAnb_GenLep ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
-                        FillHisto(h_Gen_dR3_af_Genb_GenAnb     ,Gen_dR_Genb_GenAnLep ,Gen_dR_GenAnb_GenLep  ,evt_weight_);
+                        FillHisto(h_Gen_dR3_af_Genb_GenAnb     ,Gen_dR_GenAnb_GenLep ,Gen_dR_Genb_GenAnLep  ,evt_weight_);
                         FillHisto(h_Pair_Genbpt                ,Genb->Pt()           ,evt_weight_);
                         FillHisto(h_Pair_Genbeta               ,Genb->Eta()          ,evt_weight_);
                         FillHisto(h_Pair_Genbphi               ,Genb->Phi()          ,evt_weight_);
@@ -1294,7 +1294,7 @@ void ssb_analysis::Loop( char *logfile )
                   // 제트와 Lep, AnLep 간의 dR 값을 제트 인덱스 순서대로 저장
                   dR_jet_Lep.clear();
                   dR_jet_AnLep.clear();
-                  cout << " =============== dR with Lep & AnLep =============== " << endl;
+                  //cout << " =============== dR with Lep & AnLep =============== " << endl;
                   for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
                   {
                      double dR_Lep = v_jet_TL[ijet]->DeltaR(*((TLorentzVector*)Lep));
@@ -1305,7 +1305,7 @@ void ssb_analysis::Loop( char *logfile )
                      FillHisto(h_v2_dR_Lep          ,dR_Lep            ,evt_weight_);
                      FillHisto(h_v2_dR_AnLep        ,dR_AnLep          ,evt_weight_);
                      FillHisto(h_v2_dR_Lep_AnLep    ,dR_Lep            ,dR_AnLep         ,evt_weight_);
-                     cout << "dR_jet_Lep[" << ijet << "]: " << dR_Lep << ", dR_jet_AnLep[" << ijet << "]: " << dR_AnLep << endl;
+                     //cout << "dR_jet_Lep[" << ijet << "]: " << dR_Lep << ", dR_jet_AnLep[" << ijet << "]: " << dR_AnLep << endl;
                   }
                   // 최소 dR 값과 해당 제트 인덱스 찾기
                   auto min_iter_jet_Lep = std::min_element(dR_jet_Lep.begin(), dR_jet_Lep.end());
@@ -1354,7 +1354,7 @@ void ssb_analysis::Loop( char *logfile )
                         {
                            // 두 번째 매칭 제트가 없는 경우 처리
                            v2_pair_Jet = nullptr;
-                           std::cerr << "두 번째 매칭 제트를 찾을 수 없습니다." << std::endl;
+                           cout << "can't find second min dR" << endl;
                         }
                      }
                      else
@@ -1385,11 +1385,11 @@ void ssb_analysis::Loop( char *logfile )
                         {
                            // 두 번째 매칭 제트가 없는 경우 처리
                            v2_pair_AnJet = nullptr;
-                           std::cerr << "두 번째 매칭 제트를 찾을 수 없습니다." << std::endl;
+                           cout << "can't find second min dR" << endl;
                         }
                      }
                   }
-                  cout << "v2_pair_Jet_idx: " << min_index_jet_AnLep << ", dR: " << min_dR_jet_AnLep << ", pt: " << v2_pair_Jet->Pt() << ", v2_pair_AnJet_idx: " << min_index_jet_Lep << ", dR: " << min_dR_jet_Lep << ", pt: " << v2_pair_AnJet->Pt() << endl;
+                  //cout << "v2_pair_Jet_idx: " << min_index_jet_AnLep << ", dR: " << min_dR_jet_AnLep << ", pt: " << v2_pair_Jet->Pt() << ", v2_pair_AnJet_idx: " << min_index_jet_Lep << ", dR: " << min_dR_jet_Lep << ", pt: " << v2_pair_AnJet->Pt() << endl;
                   // minimum dR distribution
                   FillHisto(h_v2_dR_Min_Lep        ,min_dR_jet_Lep         ,evt_weight_);
                   FillHisto(h_v2_dR_Min_AnLep      ,min_dR_jet_AnLep       ,evt_weight_);
@@ -1404,8 +1404,8 @@ void ssb_analysis::Loop( char *logfile )
                   {
                      // check dR values final_dR_jet_AnLep is the same as min_dR_jet_AnLep and index is the same as min_index_jet_AnLep
                      double final_dR_jet_AnLep = v2_pair_Jet->DeltaR((*((TLorentzVector*)AnLep)));
-                     if(min_dR_jet_AnLep != final_dR_jet_AnLep)
-                     {cout << "Jet & AnLep: after pairing: min_index_jet_AnLep = " << min_index_jet_AnLep << ", min_dR_jet_AnLep = " << min_dR_jet_AnLep << ", final_dR_jet_AnLep = " << final_dR_jet_AnLep << ", Jet1 pt = " << v2_pair_Jet->Pt() << endl;}
+                     //if(min_dR_jet_AnLep != final_dR_jet_AnLep)
+                     //{cout << "Jet & AnLep: after pairing: min_index_jet_AnLep = " << min_index_jet_AnLep << ", min_dR_jet_AnLep = " << min_dR_jet_AnLep << ", final_dR_jet_AnLep = " << final_dR_jet_AnLep << ", Jet1 pt = " << v2_pair_Jet->Pt() << endl;}
                      FillHisto(h_v2_pair_Jet_dR_AnLep        ,final_dR_jet_AnLep    ,evt_weight_);
                      FillHisto(h_v2_pair_Jet_idx             ,min_index_jet_AnLep    ,evt_weight_);
 
@@ -1423,8 +1423,8 @@ void ssb_analysis::Loop( char *logfile )
                      v2_pair_Lep = Lep;
                      // check dR values final_dR_jet_Lep is the same as min_dR_jet_Lep and index is the same as min_index_jet_Lep
                      double final_dR_jet_Lep = v2_pair_AnJet->DeltaR((*((TLorentzVector*)Lep)));
-                     if(min_dR_jet_Lep != final_dR_jet_Lep)
-                     {cout << "AnJet & Lep: after pairing: min_index_jet_Lep = " << min_index_jet_Lep << ", min_dR_jet_Lep = " << min_dR_jet_Lep << ", final_dR_jet_Lep = " << final_dR_jet_Lep << ", Jet2 pt = " << v2_pair_AnJet->Pt() << endl;}
+                     //if(min_dR_jet_Lep != final_dR_jet_Lep)
+                     //{cout << "AnJet & Lep: after pairing: min_index_jet_Lep = " << min_index_jet_Lep << ", min_dR_jet_Lep = " << min_dR_jet_Lep << ", final_dR_jet_Lep = " << final_dR_jet_Lep << ", Jet2 pt = " << v2_pair_AnJet->Pt() << endl;}
                      FillHisto(h_v2_pair_AnJet_dR_Lep       ,final_dR_jet_Lep      ,evt_weight_);
                      FillHisto(h_v2_pair_AnJet_idx          ,min_index_jet_Lep      ,evt_weight_);
 
@@ -3881,8 +3881,8 @@ void ssb_analysis::DeclareHistos()
    h_v2_pair_comp_Jet_pairbJet      = new TH2D(Form("_h_v2_pair_comp_Jet_pairbJet_")      ,Form("comparison for v1 & v2 Jet after pairing")     ,1000    ,0        ,1000   ,1000 ,0 ,1000);  h_v2_pair_comp_Jet_pairbJet->Sumw2();
    h_v2_pair_comp_AnJet_pairAnbJet  = new TH2D(Form("_h_v2_pair_comp_AnJet_pairAnbJet_")  ,Form("comparison for v1 & v2 AnJet after pairing")   ,1000    ,0        ,1000   ,1000 ,0 ,1000);  h_v2_pair_comp_AnJet_pairAnbJet->Sumw2();
    // invariant mass
-   h_v2_pair_Jet_AnMu_Mass       = new TH1D(Form("_h_v2_pair_Jet_AnMu_Mass_")    ,Form("Jet & AnLep Invariant Mass when minimum dR")     ,1000 ,0.0  ,1000);                                         h_v2_pair_Jet_AnMu_Mass->Sumw2();
-   h_v2_pair_AnJet_Mu_Mass       = new TH1D(Form("_h_v2_pair_AnJet_Mu_Mass_")    ,Form("AnJet & Lep Invariant Mass when minimum dR")       ,1000 ,0.0  ,1000);                                         h_v2_pair_AnJet_Mu_Mass->Sumw2();
+   h_v2_pair_Jet_AnMu_Mass       = new TH1D(Form("_h_v2_pair_Jet_AnMu_Mass_")    ,Form("Jet & AnLep Invariant Mass when minimum dR")     ,1000 ,0.0  ,1000);                                          h_v2_pair_Jet_AnMu_Mass->Sumw2();
+   h_v2_pair_AnJet_Mu_Mass       = new TH1D(Form("_h_v2_pair_AnJet_Mu_Mass_")    ,Form("AnJet & Lep Invariant Mass when minimum dR")       ,1000 ,0.0  ,1000);                                        h_v2_pair_AnJet_Mu_Mass->Sumw2();
    h_v2_pair_Jet_AnbJet_Mass     = new TH2D(Form("_h_v2_pair_Jet_AnbJet_Mass_")  ,Form("Jet+AnJet & pair_bJet+pair_AnbJet Invariant Mass when minimum dR")      , 1000, 0.0, 1000, 1000, 0.0, 1000);  h_v2_pair_Jet_AnbJet_Mass->Sumw2();
    // O3
    h_v2_CPO3_bfReco              = new TH1D(Form("_h_v2_CPO3_bfReco_")              , Form(""), 200   , -10    , 10);   h_v2_CPO3_bfReco->Sumw2();
