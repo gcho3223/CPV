@@ -1,6 +1,6 @@
 # Analysis code for CP violation in top quark pair production in dilepton channel 🚀
 
-The code and scripts included here are for the dilepton channel of the top quark and are intended for backup purposes.
+The code and scripts included here are for the dilepton channel of the top quark and are intended for **backup** purposes.
 
 ## 📂 Directory structure
 📦SSBAnalysis/   
