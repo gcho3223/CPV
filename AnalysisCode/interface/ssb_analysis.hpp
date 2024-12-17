@@ -785,32 +785,32 @@ class ssb_analysis : public SSBTree
       TH1D *h_dR_pair_AnbJet_Lep;
       TH2D *h_dR_pair_bJet_AnbJet;
       // if dR is under 3
-      TH1D *h_dRNum_pair_bJet_AnLep[6];
-      TH1D *h_dRNum_pair_AnbJet_Lep[6];
-      TH2D *h_dRNum_pair_bJet_AnbJet[6];
+      TH1D *h_dRNum_pair_bJet_AnLep[7];
+      TH1D *h_dRNum_pair_AnbJet_Lep[7];
+      TH2D *h_dRNum_pair_bJet_AnbJet[7];
       // kinematics after pairing
-      TH1D *h_Pair_bJetpt[6];
-      TH1D *h_Pair_bJeteta[6];
-      TH1D *h_Pair_bJetphi[6];
-      TH1D *h_Pair_AnbJetpt[6];
-      TH1D *h_Pair_AnbJeteta[6];
-      TH1D *h_Pair_AnbJetphi[6];
-      TH1D *h_pair_Leppt[6];
-      TH1D *h_pair_Lepeta[6];
-      TH1D *h_pair_Lepphi[6];
-      TH1D *h_pair_AnLeppt[6];
-      TH1D *h_pair_AnLepeta[6];
-      TH1D *h_pair_AnLepphi[6];
+      TH1D *h_Pair_bJetpt[7];
+      TH1D *h_Pair_bJeteta[7];
+      TH1D *h_Pair_bJetphi[7];
+      TH1D *h_Pair_AnbJetpt[7];
+      TH1D *h_Pair_AnbJeteta[7];
+      TH1D *h_Pair_AnbJetphi[7];
+      TH1D *h_pair_Leppt[7];
+      TH1D *h_pair_Lepeta[7];
+      TH1D *h_pair_Lepphi[7];
+      TH1D *h_pair_AnLeppt[7];
+      TH1D *h_pair_AnLepeta[7];
+      TH1D *h_pair_AnLepphi[7];
       // invariant mass after pairing
-      TH1D *h_pair_b_Anb_Mass[6];
-      TH1D *h_pair_Mu_AnMu_Mass[6];
-      TH1D *h_pair_b_AnMu_Mass[6];
-      TH1D *h_pair_Anb_Mu_Mass[6];
+      TH1D *h_pair_b_Anb_Mass[7];
+      TH1D *h_pair_Mu_AnMu_Mass[7];
+      TH1D *h_pair_b_AnMu_Mass[7];
+      TH1D *h_pair_Anb_Mu_Mass[7];
       // calcuate O3
-      TH1D *h_CPO3_bfReco[6];
-      TH1D *h_CPO3_bfReco_ReRange[6];
-      TH1D *h_CPO3_Pos[6];
-      TH1D *h_CPO3_Neg[6];
+      TH1D *h_CPO3_bfReco[7];
+      TH1D *h_CPO3_bfReco_ReRange[7];
+      TH1D *h_CPO3_Pos[7];
+      TH1D *h_CPO3_Neg[7];
 
       ///// generator level /////
       TH1D *h_GenMuon_pt;
@@ -1508,5 +1508,3 @@ ssb_analysis::~ssb_analysis()
 }
 
 #endif
-   
-
