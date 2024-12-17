@@ -1001,14 +1001,24 @@ void ssb_analysis::Loop( char *logfile )
                   double maxPt_bJet = 0;
                   int bTagJet_total = 0;
                   int bTagJet_is_leadingJet = 0;
+                  int bTagJet_idx = -1;
+                  //cout << "=============== b tagged jet & jet idx check ===============" << endl;
                   for (int ibjet = 0; ibjet < v_bjet_TL.size(); ++ibjet)
                   {
-                      if (v_bjet_TL[ibjet]->Pt() > maxPt_bJet)
-                      {
-                          maxPt_bJet = v_bjet_TL[ibjet]->Pt();
-                          leading_bTagJet = v_bjet_TL[ibjet];
-                      }
+                     if (v_bjet_TL[ibjet]->Pt() > maxPt_bJet)
+                     {
+                        maxPt_bJet = v_bjet_TL[ibjet]->Pt();
+                        leading_bTagJet = v_bjet_TL[ibjet];
+                        bTagJet_idx = ibjet;
+                     }
+                     //cout << "bjet idx: " << ibjet << " pT: " << v_bjet_TL[ibjet]->Pt() << endl;
                   }
+                  for(int ijet = 0; ijet < v_jet_TL.size(); ijet++)
+                  {
+                     //cout << "jet idx: " << ijet << " jet pT: " << v_jet_TL[ijet]->Pt() << endl;
+                  }
+                  //cout << "leading_bTagJet_idx: " << bTagJet_idx << ", leading_bTagJet: " << leading_bTagJet->Pt() << endl;
+                  //cout << "leading jet pT: " << Jet1->Pt() << ", subleading jet pT: " << Jet2->Pt() << endl;
                   // fraction for leading b tagging jet of whole b tagging jet
                   if (v_bjet_TL.size() > 0) 
                   {
@@ -1037,6 +1047,8 @@ void ssb_analysis::Loop( char *logfile )
                   double dR_pair_AnbJet_Lep = 999;
                   dR_bTagJet_Lep = leading_bTagJet->DeltaR(*((TLorentzVector*)Lep)); //Lep has minus charge
                   dR_bTagJet_AnLep = leading_bTagJet->DeltaR(*((TLorentzVector*)AnLep)); //AnLep has plus charge
+                  //cout << "=============== dR check ================" << endl;
+                  //cout << "dR_bTagJet_Lep: " << dR_bTagJet_Lep << ", dR_bTagJet_AnLep: " << dR_bTagJet_AnLep << endl;
                   if(dR_bTagJet_Lep < dR_bTagJet_AnLep) //bTagJet is close to Lep, it means bTagJet has minus charge, that is AnbJet
                   {
                      pair_AnbJet = leading_bTagJet;
@@ -1048,6 +1060,9 @@ void ssb_analysis::Loop( char *logfile )
 
                      dR_pair_bJet_AnLep = pair_bJet->DeltaR(*((TLorentzVector*)pair_AnLep));
                      dR_pair_AnbJet_Lep = pair_AnbJet->DeltaR(*((TLorentzVector*)pair_Lep));
+                     //cout << "dR_bTagJet_Lep < dR_bTagJet_AnLep: leading b tagging jet is close to Lep" << endl;
+                     //cout << "leading_bTagJet becomes pair_AnbJet" << endl;
+                     //cout << "dR: " << dR_bTagJet_Lep << ", pair_AnbJet: " << pair_AnbJet->Pt() << ", pair_bJet: " << pair_bJet->Pt() << ", pair_Lep: " << pair_Lep->Pt() << ", pair_AnLep: " << pair_AnLep->Pt() << endl;
                   }
                   else //bTagJet is close to AnLep
                   {
@@ -1059,6 +1074,9 @@ void ssb_analysis::Loop( char *logfile )
 
                      dR_pair_bJet_AnLep = pair_bJet->DeltaR(*((TLorentzVector*)pair_AnLep));
                      dR_pair_AnbJet_Lep = pair_AnbJet->DeltaR(*((TLorentzVector*)pair_Lep));
+                     //cout << "dR_bTagJet_Lep > dR_bTagJet_AnLep: leading b tagging jet is close to AnLep" << endl;
+                     //cout << "leading_bTagJet becomes pair_bJet" << endl;
+                     //cout << "dR: " << dR_bTagJet_AnLep << ", pair_AnbJet: " << pair_AnbJet->Pt() << ", pair_bJet: " << pair_bJet->Pt() << ", pair_Lep: " << pair_Lep->Pt() << ", pair_AnLep: " << pair_AnLep->Pt() << endl;
                   }
                   // delta R distibution: before pairing
                   FillHisto(h_dR_bTagJet_Lep    ,dR_bTagJet_Lep                     ,evt_weight_);
@@ -1069,7 +1087,8 @@ void ssb_analysis::Loop( char *logfile )
                   FillHisto(h_dR_pair_AnbJet_Lep   ,dR_pair_AnbJet_Lep                       ,evt_weight_);   //dR distribution b-bar quark & anti-lepton
                   FillHisto(h_dR_pair_bJet_AnbJet  ,dR_pair_AnbJet_Lep ,dR_pair_bJet_AnLep   ,evt_weight_);
 
-                  vector<double> v_dR_value = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+                  vector<double> v_dR_value = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 10.0}; //0, 1, 2, 3, 4, 5, 6
+                  // 10.0 is the same as no dR requirement
                   if(pair_bJet && pair_AnbJet && pair_Lep && pair_AnLep)
                   {
                      for(int idr=0; idr < v_dR_value.size(); idr++)
@@ -3756,8 +3775,8 @@ void ssb_analysis::DeclareHistos()
    h_dR_pair_bJet_AnLep    = new TH1D("_h_dR_pair_bJet_AnLep_"    ,"delta R btw pair_bJet & Lep"           , 100, 0, 10); h_dR_pair_bJet_AnLep->Sumw2();
    h_dR_pair_AnbJet_Lep    = new TH1D("_h_dR_pair_AnbJet_Lep_"    ,"delta R btw pair_bJet & AnLep"         , 100, 0, 10); h_dR_pair_AnbJet_Lep->Sumw2();
    h_dR_pair_bJet_AnbJet   = new TH2D("_h_dR_pair_bJet_AnbJet_"   ,"delta R value scatter: (pair_bJet&pair_Lep) & (pair_AnbJet&AnLep)", 100, 0, 10, 100, 0, 10); h_dR_pair_bJet_AnbJet->Sumw2();
-   // after pairing about each dR values : 0.5, 1.0, 1.5, 2.0, 2.5, 3.0
-   for(int i=0; i<6; i++)
+   // after pairing about each dR values : 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 10.0
+   for(int i=0; i<7; i++)
    {
       // dR distribution
       h_dRNum_pair_bJet_AnLep[i]   = new TH1D(Form("_h_dRNum_pair_bJet_AnLep_%d_",i)    ,Form("delta R btw pair_bJet & Lep: dR < %s",cutdRName[i].Data())         , 100, 0, 10); h_dRNum_pair_bJet_AnLep[i]->Sumw2();
