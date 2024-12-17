@@ -37,9 +37,9 @@ struct CPVari
 //	iscpv = "cpv" or "data"					   														//
 //	data option include MC and data(data_doublemuon, data_singlemuon, DY, ST, TTV, Diboson, Data)	//
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-void DrawHist(string version, string iscpv)
+void DrawHist(string version, string iscpv, string dR_value, string dR_hist)
 {
-	void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv);
+	void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv, string dR_hist);
 	void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, string iscpv);
 	CPVari O3Asym(TH1D *hist);
     CPVari tmp;
@@ -48,7 +48,7 @@ void DrawHist(string version, string iscpv)
 	//gSystem->mkdir(Form("./%s/text",version.c_str()),kTRUE);
 	ofstream outtxt;
     if(iscpv == "cpv") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_CPV.dat", version.c_str()));}
-	else if(iscpv == "data") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v27_O3v1.dat", version.c_str()));}
+	else if(iscpv == "data") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v27_O3v1_dR%s.dat", version.c_str(), dR_value.c_str()));}
     //ofstream outtxt(Form("./%s/AsymParas_repro_V1.dat",version.c_str()));
     ofstream &fout = outtxt;
 	fout << "Luminosity:  35867.059983" << endl << endl;
@@ -96,7 +96,7 @@ void DrawHist(string version, string iscpv)
 		{
 			TH1D *h_obj = (TH1D*)f->Get(Form("%s",hist1D[i1d].Data()));
 			if(h_obj == NULL){continue;}
-			Draw1DHist(h_obj,version,sample[isn],fout,iscpv);
+			Draw1DHist(h_obj,version,sample[isn],fout,iscpv,dR_hist);
 		}
 		for(int i2d=0; i2d<hist2D.size(); i2d++)
 		{
@@ -106,7 +106,7 @@ void DrawHist(string version, string iscpv)
 		}
 	}
 }
-void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv)
+void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, string iscpv, string dR_hist)
 {
 	void DrawOverflowBin(TH1D *his, double min, double max);
 	CPVari O3Asym(TH1D *hist);
@@ -219,13 +219,12 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		leg->Draw();
 
 		if( ( iscpv == "cpv" && (hname.Contains("_h_GenCPO3_bfReco_") || hname.Contains("_h_CPO3_bfReco_5_") || hname.Contains("_h_v2_CPO3_bfReco_")) ) || 
-			( iscpv == "data" && ( hname.Contains("_h_CPO3_bfReco_5_") && 
+			( iscpv == "data" && ( hname == dR_hist.c_str() ) && 
 		   		(sample == "DYJetsToLL_M_10To50" || sample == "DYJetsToLL_M_50" || sample == "Data" || 
 		    	sample == "ST_tW_antitop" || sample == "ST_tW_top" || sample == "TTJets_others" || 
 		    	sample == "TTJets_Signal" || sample == "TTbar_WJetToLNu" || sample == "TTbar_WQQ" || 
 		    	sample == "TTbar_ZQQ" || sample == "TTbar_ZToLLNuNu" || sample == "WW" || 
 		    	sample == "WZ" || sample == "ZZ") )
-			)
 		)
 		{
 			if(iscpv =="cpv") {fout << Form("<<<<<< %s >>>>>>",hname.Data()) << endl;}
@@ -252,11 +251,11 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		if(hname.Contains("_" + dR_idx[i] + "_"))
 		{
 			gSystem->mkdir(Form("%s/dR_%s/",savepath.c_str(), dR_values[i].c_str()),kTRUE);
-			c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj->GetName()));
+			//c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj->GetName()));
 		}
 	}
 	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_"))
-	{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj->GetName()));}
+	//{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj->GetName()));}
 
 	delete c;
 }
@@ -332,11 +331,11 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 		if(hname.Contains("_" + dR_idx[i] + "_"))
 		{
 			gSystem->mkdir(Form("%s/dR_%s/",savepath.c_str(), dR_values[i].c_str()),kTRUE);
-			c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj2D->GetName()));
+			//c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj2D->GetName()));
 		}
 	}
 	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_"))
-	{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj2D->GetName()));}
+	//{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj2D->GetName()));}
 
 	delete c;
 }

@@ -56,6 +56,12 @@ vector<TString> hist1D =
     "_h_pair_Leppt_5_","_h_pair_Lepeta_5_","_h_pair_Lepphi_5_","_h_pair_AnLeppt_5_","_h_pair_AnLepeta_5_","_h_pair_AnLepphi_5_",        // kinematics: Mu, AnMu
     "_h_pair_b_Anb_Mass_5_","_h_pair_Mu_AnMu_Mass_5_","_h_pair_b_AnMu_Mass_5_","_h_pair_Anb_Mu_Mass_5_",                                // invariant mass
     "_h_CPO3_bfReco_5_","_h_CPO3_Pos_5_","_h_CPO3_Neg_5_",                                                  // O3
+    // 4-6) dR < 10.0 absolutely no dR requirement
+	"_h_dRNum_pair_bJet_AnLep_6_","_h_dRNum_pair_AnbJet_Lep_6_",                                                                        // dR distribution
+    "_h_Pair_bJetpt_6_","_h_Pair_bJeteta_6_","_h_Pair_bJetphi_6_","_h_Pair_AnbJetpt_6_","_h_Pair_AnbJeteta_6_","_h_Pair_AnbJetphi_6_",  // kinematics: b, Anb
+    "_h_pair_Leppt_6_","_h_pair_Lepeta_6_","_h_pair_Lepphi_6_","_h_pair_AnLeppt_6_","_h_pair_AnLepeta_6_","_h_pair_AnLepphi_6_",        // kinematics: Mu, AnMu
+    "_h_pair_b_Anb_Mass_6_","_h_pair_Mu_AnMu_Mass_6_","_h_pair_b_AnMu_Mass_6_","_h_pair_Anb_Mu_Mass_6_",                                // invariant mass
+    "_h_CPO3_bfReco_6_","_h_CPO3_Pos_6_","_h_CPO3_Neg_6_",                                                  // O3
 
 	///////////////////////////
     ///// generator level /////
