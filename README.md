@@ -1,8 +1,8 @@
-# Analysis code for CP violation in top quark pair production in dilepton channel 🚀
+# ⚠️Analysis code for CP violation in top quark pair production in dilepton channel 🚀
 
 The code and scripts included here are for the dilepton channel of the top quark and are intended for **backup** purposes.
 
-## 📂 Directory structure
+## 📂Directory structure
 📦SSBAnalysis/   
 ├── 📂AnalysisCode/   
 │ ├── 📂Condor/   
@@ -17,7 +17,7 @@ The code and scripts included here are for the dilepton channel of the top quark
 │ └── 📜testrun.sh   
 └── 📜README.md   
 
-## 📁 Directory description
+## 📁Directory description
 - **Condor/**: Condor script generator and condor job summary script generator are included.
 - **backup/**: Kinematic Reconstruction related code is included.
 - **interface/**: header files for the analysis code are included.
@@ -28,7 +28,7 @@ The code and scripts included here are for the dilepton channel of the top quark
 - **run_ssb_check.sh**: script for checking the analysis code is included.
 - **testrun.sh**: script for testing the analysis code is included.
 
-## 📜 Code Description
+## 📜Code Description
 ### Condor Directory
 📦Condor   
 ├── 📂Backup   
