@@ -1095,39 +1095,39 @@ void ssb_analysis::Loop( char *logfile )
                      {
                         if(dR_pair_bJet_AnLep < v_dR_value[idr] && dR_pair_AnbJet_Lep < v_dR_value[idr]) // bJet-Lep, AnbJet-AnLep간의 거리가 v_dR_value[idr](0.5~3.0) 이하일때
                         {
-                        FillHisto(h_dRNum_pair_bJet_AnLep[idr]  ,dR_pair_bJet_AnLep  ,evt_weight_);
-                        FillHisto(h_dRNum_pair_AnbJet_Lep[idr]  ,dR_pair_AnbJet_Lep  ,evt_weight_);
-                        FillHisto(h_dRNum_pair_bJet_AnbJet[idr] ,dR_pair_AnbJet_Lep  ,dR_pair_bJet_AnLep  ,evt_weight_);
-                        FillHisto(h_Pair_bJetpt[idr]     ,pair_bJet->Pt()    ,evt_weight_);
-                        FillHisto(h_Pair_bJeteta[idr]    ,pair_bJet->Eta()   ,evt_weight_);
-                        FillHisto(h_Pair_bJetphi[idr]    ,pair_bJet->Phi()   ,evt_weight_);
-                        FillHisto(h_Pair_AnbJetpt[idr]   ,pair_AnbJet->Pt()  ,evt_weight_);
-                        FillHisto(h_Pair_AnbJeteta[idr]  ,pair_AnbJet->Eta() ,evt_weight_);
-                        FillHisto(h_Pair_AnbJetphi[idr]  ,pair_AnbJet->Phi() ,evt_weight_);
-                        FillHisto(h_pair_Leppt[idr]      ,pair_Lep->Pt()     ,evt_weight_);
-                        FillHisto(h_pair_Lepeta[idr]     ,pair_Lep->Eta()    ,evt_weight_);
-                        FillHisto(h_pair_Lepphi[idr]     ,pair_Lep->Phi()    ,evt_weight_);
-                        FillHisto(h_pair_AnLeppt[idr]    ,pair_AnLep->Pt()   ,evt_weight_);
-                        FillHisto(h_pair_AnLepeta[idr]   ,pair_AnLep->Eta()  ,evt_weight_);
-                        FillHisto(h_pair_AnLepphi[idr]   ,pair_AnLep->Phi()  ,evt_weight_);                                       
-                        //invariant mass distribution
-                        // 1) (An)bJet - (An)Mu
-                        FillHisto(h_pair_b_Anb_Mass[idr]   ,( (*pair_bJet)+(*pair_AnbJet) ).M()  ,evt_weight_ );
-                        FillHisto(h_pair_Mu_AnMu_Mass[idr] ,( (*pair_Lep)+(*pair_AnLep) ).M()    ,evt_weight_ );
-                        // 2) bJet - AnbJet , Mu - AnMu
-                        FillHisto(h_pair_b_AnMu_Mass[idr]  ,( (*pair_bJet)+(*pair_AnLep) ).M()   ,evt_weight_ );
-                        FillHisto(h_pair_Anb_Mu_Mass[idr]  ,( (*pair_AnbJet)+(*pair_Lep) ).M()   ,evt_weight_ );
-                        //cout << "Reco O3 v1 dR: " << v_dR_value[idr] << endl;
-                        //cout << "bJet: " << (*pair_bJet).M() << ", AnbJet: " << (*pair_AnbJet).M() << ", Lep: " << (*pair_Lep).M() << ", AnLep: " << (*pair_AnLep).M() << endl;
-                        //cout << "bJet-AnLep: " << ( (*pair_bJet)+(*pair_AnLep) ).M() << ", AnbJet-Lep: " << ( (*pair_AnbJet)+(*pair_Lep) ).M() << endl;
-                        // calculate O3
-                        double n_cpO3 = ssbcpviol->getO3Vari( pair_bJet , pair_AnbJet, pair_AnLep, pair_Lep );
-                        if(n_cpO3 == 0.0 ){cout << "--00000000000000--" << n_cpO3 << endl;}
-                        // Calculating O3 error.
-                        if(n_cpO3 > 0.0) {FillHisto(h_CPO3_Pos[idr]  ,n_cpO3  ,evt_weight_);}
-                        else             {FillHisto(h_CPO3_Neg[idr]  ,n_cpO3  ,evt_weight_);}
-                        FillHisto(h_CPO3_bfReco[idr]        ,n_cpO3  ,evt_weight_);
-                        FillHisto(h_CPO3_bfReco_ReRange[idr],n_cpO3  ,evt_weight_);
+                           FillHisto(h_dRNum_pair_bJet_AnLep[idr]  ,dR_pair_bJet_AnLep  ,evt_weight_);
+                           FillHisto(h_dRNum_pair_AnbJet_Lep[idr]  ,dR_pair_AnbJet_Lep  ,evt_weight_);
+                           FillHisto(h_dRNum_pair_bJet_AnbJet[idr] ,dR_pair_AnbJet_Lep  ,dR_pair_bJet_AnLep  ,evt_weight_);
+                           FillHisto(h_Pair_bJetpt[idr]     ,pair_bJet->Pt()    ,evt_weight_);
+                           FillHisto(h_Pair_bJeteta[idr]    ,pair_bJet->Eta()   ,evt_weight_);
+                           FillHisto(h_Pair_bJetphi[idr]    ,pair_bJet->Phi()   ,evt_weight_);
+                           FillHisto(h_Pair_AnbJetpt[idr]   ,pair_AnbJet->Pt()  ,evt_weight_);
+                           FillHisto(h_Pair_AnbJeteta[idr]  ,pair_AnbJet->Eta() ,evt_weight_);
+                           FillHisto(h_Pair_AnbJetphi[idr]  ,pair_AnbJet->Phi() ,evt_weight_);
+                           FillHisto(h_pair_Leppt[idr]      ,pair_Lep->Pt()     ,evt_weight_);
+                           FillHisto(h_pair_Lepeta[idr]     ,pair_Lep->Eta()    ,evt_weight_);
+                           FillHisto(h_pair_Lepphi[idr]     ,pair_Lep->Phi()    ,evt_weight_);
+                           FillHisto(h_pair_AnLeppt[idr]    ,pair_AnLep->Pt()   ,evt_weight_);
+                           FillHisto(h_pair_AnLepeta[idr]   ,pair_AnLep->Eta()  ,evt_weight_);
+                           FillHisto(h_pair_AnLepphi[idr]   ,pair_AnLep->Phi()  ,evt_weight_);                                       
+                           //invariant mass distribution
+                           // 1) (An)bJet - (An)Mu
+                           FillHisto(h_pair_b_Anb_Mass[idr]   ,( (*pair_bJet)+(*pair_AnbJet) ).M()  ,evt_weight_ );
+                           FillHisto(h_pair_Mu_AnMu_Mass[idr] ,( (*pair_Lep)+(*pair_AnLep) ).M()    ,evt_weight_ );
+                           // 2) bJet - AnbJet , Mu - AnMu
+                           FillHisto(h_pair_b_AnMu_Mass[idr]  ,( (*pair_bJet)+(*pair_AnLep) ).M()   ,evt_weight_ );
+                           FillHisto(h_pair_Anb_Mu_Mass[idr]  ,( (*pair_AnbJet)+(*pair_Lep) ).M()   ,evt_weight_ );
+                           //cout << "Reco O3 v1 dR: " << v_dR_value[idr] << endl;
+                           //cout << "bJet: " << (*pair_bJet).M() << ", AnbJet: " << (*pair_AnbJet).M() << ", Lep: " << (*pair_Lep).M() << ", AnLep: " << (*pair_AnLep).M() << endl;
+                           //cout << "bJet-AnLep: " << ( (*pair_bJet)+(*pair_AnLep) ).M() << ", AnbJet-Lep: " << ( (*pair_AnbJet)+(*pair_Lep) ).M() << endl;
+                           // calculate O3
+                           double n_cpO3 = ssbcpviol->getO3Vari( pair_bJet , pair_AnbJet, pair_AnLep, pair_Lep );
+                           if(n_cpO3 == 0.0 ){cout << "--00000000000000--" << n_cpO3 << endl;}
+                           // Calculating O3 error.
+                           if(n_cpO3 > 0.0) {FillHisto(h_CPO3_Pos[idr]  ,n_cpO3  ,evt_weight_);}
+                           else             {FillHisto(h_CPO3_Neg[idr]  ,n_cpO3  ,evt_weight_);}
+                           FillHisto(h_CPO3_bfReco[idr]        ,n_cpO3  ,evt_weight_);
+                           FillHisto(h_CPO3_bfReco_ReRange[idr],n_cpO3  ,evt_weight_);
                         }
                      }
                   }
@@ -1292,10 +1292,16 @@ void ssb_analysis::Loop( char *logfile )
                   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                   //       << O3 version 2 >>                                                                                      //
                   //       - use all jets                                                                                          //
-                  //       - calcuate dR with jet & lepton                                                                         //
-                  //       - if dR value is minimum, match leptons(muon, antimuon)                                                 //
-                  //       - also paired jet is exclude at the next matching                                                       //
-                  //       - get O3 with dR < 3.0                                                                                  //
+                  //       - calcuate dR with jet & (anti-)lepton then, save the values                                            //
+                  //       - find jet idx that has minimum dR with (anti-)lepton                                                   //
+                  //       - if they have different index, pair them                                                               //
+                  //       - if indices are the same, follow substeps                                                              //
+                  //          - sub 1) dR w/ anti-lepton is smaller than dR w/ lepton                                              //
+                  //             - pair the jet with anti-lepton as pair_bJet                                                      //
+                  //             - find second minimum dR value and pair them with lepton                                          //
+                  //          - sub 2) dR w/ lepton is smaller than dR w/ anti-lepton                                              //
+                  //             - pair the jet with lepton as pair_AnbJet                                                         //
+                  //             - find second minimum dR value and pair them with anti-lepton                                     //
                   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                   // 1) All jets; before pairing   //
                   ///////////////////////////////////
