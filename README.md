@@ -5,6 +5,7 @@ The code and scripts included here are for the dilepton channel of the top quark
 ## 📂Directory structure
 📦SSBAnalysis/   
 ├── 📂AnalysisCode/   
+│ ├── 📂CPVAsymAndPlotters/   
 │ ├── 📂Condor/   
 │ ├── 📂backup/   
 │ ├── 📂interface/   
@@ -28,7 +29,25 @@ The code and scripts included here are for the dilepton channel of the top quark
 - **run_ssb_check.sh**: script for checking the analysis code is included.
 - **testrun.sh**: script for testing the analysis code is included.
 
-## 📜Code Description
+## 📜Code Description   
+### CPVAsymAndPlotters Directory
+- calculate O3 asymmetry and ttbar cross section using likelihood function
+📦CPVAsymAndPlotters   
+├── 📂config   
+├── 📂dat   
+├── 📂output   
+├── 📜main_Asym_Calc.cpp   
+└── 📜run_auto_con.sh   
+- **config/**: configuration files(signal efficiency at step5 which is before top reconstruction).
+- **dat/**: O3 asymmetry parameters at step5 for each samples.
+- **output/**: O3 asymmetry and ttbar cross section for new algorithm v1(with different dR cut) & v2.
+- **main_Asym_Calc.cpp**: main code
+- **run_auto_con.sh**: script for running.
+    - to run this code, need an argument for the version of new algorithm(v1 or v2).
+    ```
+    ./run_auto_con.sh v1(or v2)
+    ```
+
 ### Condor Directory
 📦Condor   
 ├── 📂Backup   
