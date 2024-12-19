@@ -1,0 +1,299 @@
+The number of options is: 16
+channel : MuMu
+ studyName : SystematicStudy_v28
+ outputDir : SystematicStudy_v28/MuMu/
+ outputO3version : O3v1_dR1p0
+ object : O3
+ inputFileName : SystematicStudy_v28/MuMu/Asymmetry_dimu_SystematicStudy_v28_O3v1_dR1p0.dat
+ confFile : SystematicStudy_v28/MuMu/CP_Inputs_dimu_SystematicStudy_v28.config
+
+SetConfFile Sig EFF !!!!0.001667
+Obs : O3 Channel MuMu
+Luminosity !!! 35867.1
+chan ??dimu
+-------------Chek Asym----------------
+it first DYJetsToLL_M_10To50 second : nan
+it first DYJetsToLL_M_50 second : 0.516188
+it first Data second : -0.000443
+it first ST_tW_antitop second : 0.147827
+it first ST_tW_top second : -0.233502
+it first TTJets_Signal second : -0.003206
+it first TTJets_others second : 0.014947
+it first TTbar_WJetToLNu second : 0.022155
+it first TTbar_WQQ second : 0.296181
+it first TTbar_ZQQ second : 0.032016
+it first TTbar_ZToLLNuNu second : 0.009903
+it first WW second : -1
+it first WZ second : nan
+it first ZZ second : -1
+-------------Chek AsymErr----------------
+it first DYJetsToLL_M_10To50 second : nan
+it first DYJetsToLL_M_50 second : 0.241065
+it first Data second : 0.021058
+it first ST_tW_antitop second : 0.095586
+it first ST_tW_top second : 0.100653
+it first TTJets_Signal second : 0.00957
+it first TTJets_others second : 0.021847
+it first TTbar_WJetToLNu second : 0.05449
+it first TTbar_WQQ second : 0.244066
+it first TTbar_ZQQ second : 0.209978
+it first TTbar_ZToLLNuNu second : 0.04639
+it first WW second : 0
+it first WZ second : nan
+it first ZZ second : 0
+-------------Chek NPlus----------------
+it first DYJetsToLL_M_10To50 second : 0
+it first DYJetsToLL_M_50 second : 14.1762
+it first Data second : 1127
+it first ST_tW_antitop second : 11.2199
+it first ST_tW_top second : 6.54519
+it first TTJets_Signal second : 1056.83
+it first TTJets_others second : 205.159
+it first TTbar_WJetToLNu second : 0.935395
+it first TTbar_WQQ second : 0.960374
+it first TTbar_ZQQ second : 1.25434
+it first TTbar_ZToLLNuNu second : 0.707192
+it first WW second : 0
+it first WZ second : 0
+it first ZZ second : 0
+-------------Chek NPlusErr----------------
+it first DYJetsToLL_M_10To50 second : 0
+it first DYJetsToLL_M_50 second : 5.65386
+it first Data second : 98.4769
+it first ST_tW_antitop second : 3.60006
+it first ST_tW_top second : 2.17408
+it first TTJets_Signal second : 45.129
+it first TTJets_others second : 15.6894
+it first TTbar_WJetToLNu second : 0.279352
+it first TTbar_WQQ second : 0.670379
+it first TTbar_ZQQ second : 0.924406
+it first TTbar_ZToLLNuNu second : 0.156688
+it first WW second : 0
+it first WZ second : 0
+it first ZZ second : 0
+-------------Chek F Plus----------------
+it first DYJetsToLL_M_10To50 second : nan
+it first DYJetsToLL_M_50 second : 0.758094
+it first Data second : 0.499778
+it first ST_tW_antitop second : 0.573913
+it first ST_tW_top second : 0.383249
+it first TTJets_Signal second : 0.498397
+it first TTJets_others second : 0.507473
+it first TTbar_WJetToLNu second : 0.511077
+it first TTbar_WQQ second : 0.648091
+it first TTbar_ZQQ second : 0.516008
+it first TTbar_ZToLLNuNu second : 0.504952
+it first WW second : 0
+it first WZ second : nan
+it first ZZ second : 0
+-------------Chek NMinus----------------
+it first DYJetsToLL_M_10To50 second : 0
+it first DYJetsToLL_M_50 second : 4.5236
+it first Data second : 1128
+it first ST_tW_antitop second : 8.32989
+it first ST_tW_top second : 10.533
+it first TTJets_Signal second : 1063.63
+it first TTJets_others second : 199.116
+it first TTbar_WJetToLNu second : 0.894846
+it first TTbar_WQQ second : 0.521477
+it first TTbar_ZQQ second : 1.17651
+it first TTbar_ZToLLNuNu second : 0.693323
+it first WW second : 0.558836
+it first WZ second : 0
+it first ZZ second : 0.564171
+-------------Chek NMinusErr----------------
+it first DYJetsToLL_M_10To50 second : 0
+it first DYJetsToLL_M_50 second : 2.61736
+it first Data second : 95.3525
+it first ST_tW_antitop second : 2.62742
+it first ST_tW_top second : 3.03655
+it first TTJets_Signal second : 45.5153
+it first TTJets_others second : 15.8017
+it first TTbar_WJetToLNu second : 0.257531
+it first TTbar_WQQ second : 0.65561
+it first TTbar_ZQQ second : 0.910774
+it first TTbar_ZToLLNuNu second : 0.155313
+it first WW second : 0.558836
+it first WZ second : 0
+it first ZZ second : 0.564171
+-------------Chek F Minus----------------
+it first DYJetsToLL_M_10To50 second : nan
+it first DYJetsToLL_M_50 second : 0.241906
+it first Data second : 0.500222
+it first ST_tW_antitop second : 0.426087
+it first ST_tW_top second : 0.616751
+it first TTJets_Signal second : 0.501603
+it first TTJets_others second : 0.492527
+it first TTbar_WJetToLNu second : 0.488923
+it first TTbar_WQQ second : 0.351909
+it first TTbar_ZQQ second : 0.483992
+it first TTbar_ZToLLNuNu second : 0.495048
+it first WW second : 1
+it first WZ second : nan
+it first ZZ second : 1
+-------------Chek N Total----------------
+it first DYJetsToLL_M_10To50 second : 0
+it first DYJetsToLL_M_50 second : 18.6998
+it first Data second : 2255
+it first ST_tW_antitop second : 19.5498
+it first ST_tW_top second : 17.0782
+it first TTJets_Signal second : 2120.46
+it first TTJets_others second : 404.274
+it first TTbar_WJetToLNu second : 1.83024
+it first TTbar_WQQ second : 1.48185
+it first TTbar_ZQQ second : 2.43085
+it first TTbar_ZToLLNuNu second : 1.40051
+it first WW second : 0.558836
+it first WZ second : 0
+it first ZZ second : 0.564171
+Make Values for Likelihood fit !!
+it->first : DYJetsToLL_M_10To50
+it->first : DYJetsToLL_M_50
+it->first : ST_tW_antitop
+it->first : ST_tW_top
+it->first : TTJets_others
+it->first : TTbar_WJetToLNu
+it->first : TTbar_WQQ
+it->first : TTbar_ZQQ
+it->first : TTbar_ZToLLNuNu
+it->first : WW
+it->first : WZ
+it->first : ZZ
+N_mc : 467.869
+Return Values !!!!
+_nparam : 10
+step_size ? 1e-05
+Inputs::Init_Asym ? -0.003206
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     9 sigma_tt     8.31700e+02  1.00000e-05     no limits
+    10 Asymmetry   -3.20600e-03  1.00000e-05     no limits
+ **********
+ **    1 **FIX           1
+ **********
+ PARAMETER    1  IS UNDEFINED. IGNORED.
+ **********
+ **    2 **FIX           2
+ **********
+ PARAMETER    2  IS UNDEFINED. IGNORED.
+ **********
+ **    3 **FIX           3
+ **********
+ PARAMETER    3  IS UNDEFINED. IGNORED.
+ **********
+ **    4 **FIX           4
+ **********
+ PARAMETER    4  IS UNDEFINED. IGNORED.
+ **********
+ **    5 **FIX           5
+ **********
+ PARAMETER    5  IS UNDEFINED. IGNORED.
+ **********
+ **    6 **FIX           6
+ **********
+ PARAMETER    6  IS UNDEFINED. IGNORED.
+ **********
+ **    7 **FIX           7
+ **********
+ PARAMETER    7  IS UNDEFINED. IGNORED.
+ **********
+ **    8 **FIX           8
+ **********
+ PARAMETER    8  IS UNDEFINED. IGNORED.
+ **********
+ **    9 **FIX           9
+ **********
+ **********
+ **   10 **FIX          10
+ **********
+ **********
+ **   11 **RELEASE          10
+ **********
+                   PARAMETER   10  Asymmetry RESTORED TO VARIABLE.
+ **********
+ **   12 **RELEASE           9
+ **********
+                   PARAMETER    9  sigma_tt RESTORED TO VARIABLE.
+ **********
+ **   13 **RELEASE           8
+ **********
+ PARAMETER    8  IS UNDEFINED. IGNORED.
+ **********
+ **   14 **RELEASE           7
+ **********
+ PARAMETER    7  IS UNDEFINED. IGNORED.
+ **********
+ **   15 **RELEASE           6
+ **********
+ PARAMETER    6  IS UNDEFINED. IGNORED.
+ **********
+ **   16 **RELEASE           5
+ **********
+ PARAMETER    5  IS UNDEFINED. IGNORED.
+ **********
+ **   17 **RELEASE           4
+ **********
+ PARAMETER    4  IS UNDEFINED. IGNORED.
+ **********
+ **   18 **RELEASE           3
+ **********
+ PARAMETER    3  IS UNDEFINED. IGNORED.
+ **********
+ **   19 **RELEASE           2
+ **********
+ PARAMETER    2  IS UNDEFINED. IGNORED.
+ **********
+ **   20 **CALL FCN           1
+ **********
+ FCN=27351.2 FROM CALl fcn    STATUS=RESET           1 CALLS           1 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS      PHYSICAL LIMITS       
+  NO.   NAME      VALUE            ERROR       NEGATIVE      POSITIVE  
+   9  sigma_tt     8.31700e+02   1.00000e-05
+  10  Asymmetry   -3.20600e-03   1.00000e-05
+ **********
+ **   21 **SET PRINT
+ **********
+ **********
+ **   22 **SET RAN   1.235e+08
+ **********
+ **********
+ **   23 **MIGRAD       1e+07       0.001
+ **********
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ FCN=-13592.6 FROM MIGRAD    STATUS=CONVERGED      58 CALLS          59 TOTAL
+                     EDM=1.47627e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   9  sigma_tt     2.98900e+01   1.12320e+00   6.39475e-02   1.46778e-04
+  10  Asymmetry   -8.41793e-03   3.75788e-02   2.13923e-03   1.25645e-03
+ **********
+ **   24 **SET ERR         0.5
+ **********
+ **********
+ **   25 **MINOS
+ **********
+ FCN=-13592.6 FROM MINOS     STATUS=SUCCESSFUL     36 CALLS          95 TOTAL
+                     EDM=1.47627e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                  PARABOLIC         MINOS ERRORS        
+  NO.   NAME      VALUE            ERROR      NEGATIVE      POSITIVE   
+   9  sigma_tt     2.98900e+01   7.94221e-01  -7.88749e-01   7.99714e-01
+  10  Asymmetry   -8.41793e-03   2.65723e-02  -2.65718e-02   2.65679e-02
+                               ERR DEF= 0.5
+
+
+========================================================================================================= 
+====                             Summary of likelihood fit by Minuit                                ===== 
+========================================================================================================= 
+
+
+----------------------------------------------------------------------------------------------------------
+Asymmetry O3 = -0.00841793 +0.0265679 --0.0265718  (MINOS errors)
+xsection ttbar O3 = 29.89 +0.799714 --0.788749  (MINOS errors)
+----------------------------------------------------------------------------------------------------------
+
+
+
+End processing...
+
