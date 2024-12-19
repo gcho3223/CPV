@@ -48,8 +48,11 @@ void DrawHist(string version, string iscpv, string dR_value, string dR_hist)
 	//gSystem->mkdir(Form("./%s/text",version.c_str()),kTRUE);
 	ofstream outtxt;
     if(iscpv == "cpv") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_CPV.dat", version.c_str()));}
-	else if(iscpv == "data") {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v27_O3v1_dR%s.dat", version.c_str(), dR_value.c_str()));}
-    //ofstream outtxt(Form("./%s/AsymParas_repro_V1.dat",version.c_str()));
+	else if(iscpv == "data")
+	{
+		if(dR_hist.find("v2") != string::npos) {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v28_O3v2.dat", version.c_str()));}
+		else {outtxt.open(Form("./Job_Version/%s/Asymmetry_dimu_SystematicStudy_v28_O3v1_dR%s.dat", version.c_str(), dR_value.c_str()));}
+	}
     ofstream &fout = outtxt;
 	fout << "Luminosity:  35867.059983" << endl << endl;
 	/// delta R ratio ///
@@ -116,8 +119,8 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 
 	TString hname = h_obj->GetName();
 
-	vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0"};
-	vector<string> dR_idx = {"0","1","2","3","4","5"};
+	vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0", "10p0"};
+	vector<string> dR_idx = {"0","1","2","3","4","5","6"};
 
 	/// define save path ///
 	string savepath;
@@ -251,11 +254,11 @@ void Draw1DHist(TH1D *h_obj, string version, string sample, ostream &fout, strin
 		if(hname.Contains("_" + dR_idx[i] + "_"))
 		{
 			gSystem->mkdir(Form("%s/dR_%s/",savepath.c_str(), dR_values[i].c_str()),kTRUE);
-			//c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj->GetName()));
+			c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj->GetName()));
 		}
 	}
 	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_"))
-	//{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj->GetName()));}
+	{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj->GetName()));}
 
 	delete c;
 }
@@ -265,8 +268,8 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 
 	TLegend *leg2d;
 
-	vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0"};
-	vector<string> dR_idx = {"0","1","2","3","4","5"};
+	vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0", "10p0"};
+	vector<string> dR_idx = {"0","1","2","3","4","5","6"};
 
 	TCanvas *c = new TCanvas("c",hname,800,800);
 
@@ -331,11 +334,11 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 		if(hname.Contains("_" + dR_idx[i] + "_"))
 		{
 			gSystem->mkdir(Form("%s/dR_%s/",savepath.c_str(), dR_values[i].c_str()),kTRUE);
-			//c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj2D->GetName()));
+			c->SaveAs(Form("%s/dR_%s/%s.pdf",savepath.c_str(), dR_values[i].c_str(), h_obj2D->GetName()));
 		}
 	}
 	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_"))
-	//{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj2D->GetName()));}
+	{c->SaveAs(Form("%s/%s.pdf",savepath.c_str(),h_obj2D->GetName()));}
 
 	delete c;
 }
