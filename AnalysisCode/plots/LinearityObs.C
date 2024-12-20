@@ -25,14 +25,14 @@ struct CPVari
     double num_total_ = 0.;
 };
 void LinearityObs(string version, string opt)
-//////////////////////////////////////////////////////////////////////////
-//  opt description                                                     //
-//  1) reco: reco lv O3 with different dR (0.5~3.0, 0.5 interval)       //
-//  2) gen: gen lv O3                                                   //
-//  3) v2: O3 used all jets that is matched to leptons with minimum dR  //
-//  4) ref: O3 after top reconstruction for reference                   //
-//  ** if you need other options, add savepath and vCPO3 vector array   //
-//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//  opt description                                                             //
+//  1) recov1: reco lv O3 with different dR (0.5~3.0, 0.5 interval, and 10.0)   //
+//  2) gen: gen lv O3                                                           //
+//  3) recov2: O3 used all jets that is matched to leptons with minimum dR      //
+//  4) ref: O3 after top reconstruction for reference                           //
+//  ** if you need other options, add savepath and vCPO3 vector array           //
+//////////////////////////////////////////////////////////////////////////////////
 {
     CPVari O3Asym(TH1D *hist, string version, string savepath, string vdtG, double xsec, ostream &fout);
     //CPVari CalAsymVari(TH1D* h1,string version, string savepath, string vdtG, double xsec, ostream &fout);
@@ -40,7 +40,7 @@ void LinearityObs(string version, string opt)
     TLatex text;
     TLine *line;
     TLegend *lleg;
-    CPVari tmp[6][7];
+    CPVari tmp[7][7];
     CPVari tmp_data;
 
     ///// canvas save /////
@@ -49,6 +49,7 @@ void LinearityObs(string version, string opt)
     else if(opt == "gen") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Gen",version.c_str());}
     else if(opt == "recov2") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Reco/O3_v2",version.c_str());}
     else if(opt == "ref") {savepath = Form("./Job_Version/%s/CPV_Sample/Linearity/Ref",version.c_str());}
+    else {cout << "Something Wrong!! check opt!!!: recov1, recov2, gen, ref" << endl;}
     
 	gSystem->mkdir(Form("%s/",savepath.c_str()),kTRUE);
 
@@ -60,25 +61,27 @@ void LinearityObs(string version, string opt)
 
     vector<string> vdtG = {"dtG_m2p60364","dtG_m1p0415","dtG_m0p5207","dtG_0","dtG_0p5207","dtG_1p0415","dtG_2p60364"};
     vector<string> vCPO3;
-    if(opt == "recov1") {vCPO3 = {"_h_CPO3_bfReco_0_","_h_CPO3_bfReco_1_","_h_CPO3_bfReco_2_","_h_CPO3_bfReco_3_","_h_CPO3_bfReco_4_","_h_CPO3_bfReco_5_"};}
+    if(opt == "recov1") {vCPO3 = {"_h_CPO3_bfReco_0_","_h_CPO3_bfReco_1_","_h_CPO3_bfReco_2_","_h_CPO3_bfReco_3_","_h_CPO3_bfReco_4_","_h_CPO3_bfReco_5_","_h_CPO3_bfReco_6_"};}
     else if(opt == "gen") {vCPO3 = {"_h_GenCPO3_bfReco_"};}
     else if(opt == "recov2") {vCPO3 = {"_h_v2_CPO3_bfReco_"};}
     else if(opt == "ref") {vCPO3 = {"h_Reco_CPO3"};}
 
-    vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0"};
-	vector<string> dR_idx = {"0","1","2","3","4","5"};
+    vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0", "10p0"};
+	vector<string> dR_idx = {"0","1","2","3","4","5","6"};
 
     vector<string> vdRO3;
     vector<double> xsec = {27.501577, 21.593304, 20.768613, 20.496633, 20.770416, 21.593084, 27.502804};
     Double_t vdtG_Xval[7] = {-2.60364,-1.0415,-0.5207,0,0.5207,1.0415,2.60364};
-    Double_t vdtG_Yval[6][7];
-    Double_t vdtG_StatErr[6][7];
+    Double_t vdtG_Yval[7][7];
+    Double_t vdtG_StatErr[7][7];
     ///////////////////////////////////////////////
     // Data+MC O3 Asymmetry using likelihood fit //
     ///////////////////////////////////////////////
-    Double_t vLike_Yval = 0.00850289;
-    Double_t vLike_StatErr_p = 0.00507752;
-    Double_t vLike_StatErr_m = 0.00507841;
+    Double_t vLike_Yval= -99.0;
+    Double_t vLike_StatErr_p= -99.0;
+    Double_t vLike_StatErr_m= -99.0;
+    if(opt == "recov1") {vLike_Yval = -0.00353946; vLike_StatErr_p = 0.00508294; vLike_StatErr_m = 0.00508286;} //dR <10.0
+    else if(opt == "recov2") {vLike_Yval = 0.00852509; vLike_StatErr_p = 0.00508235; vLike_StatErr_m = 0.00508338;}
 
     for(int icp=0; icp<vCPO3.size(); icp++)
     {
@@ -98,10 +101,7 @@ void LinearityObs(string version, string opt)
                 h_CPO3 = (TH1D*)f->Get(Form("%s",vCPO3[0].c_str()));
                 if(h_CPO3==NULL){cout << Form("empty %s.......",vCPO3[0].c_str()) << endl;}
             }
-            //vdtG_Yval[idtg] = O3Asym(h_CPO3, version, savepath, vdtG[idtg], xsec[idtg], fout);
             tmp[icp][idtg] = O3Asym(h_CPO3, version, savepath, vdtG[idtg], xsec[idtg], fout);
-            //vdtG_StatErr[idtg] = HistStatErr(h_CPO3, vdtG[idtg], xsec[idtg], fout);
-            //CPVari tmp = CalAsymVari(h_CPO3,version, savepath, vdtG[idtg], xsec[idtg], fout);
             vdtG_Yval[icp][idtg] = tmp[icp][idtg].asym_;
             vdtG_StatErr[icp][idtg] = tmp[icp][idtg].asym_err_;
             cout << vdtG_Yval[icp][idtg] << endl;
@@ -222,8 +222,8 @@ CPVari O3Asym(TH1D *hist, string version, string savepath, string vdtG, double x
     double AsymErr = 0.0000;
     double xbin = 0;
 
-    vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0"};
-	vector<string> dR_idx = {"0","1","2","3","4","5"};
+    vector<string> dR_values = {"0p5", "1p0", "1p5", "2p0", "2p5", "3p0", "10p0"};
+	vector<string> dR_idx = {"0","1","2","3","4","5","6"};
 
     TLegend *leg;
 
@@ -309,7 +309,7 @@ CPVari O3Asym(TH1D *hist, string version, string savepath, string vdtG, double x
 			c->SaveAs(Form("%s/dR_%s/%s_%s.pdf",savepath.c_str(), dR_values[i].c_str(),vdtG.c_str(), hist->GetName()));
 		}
 	}
-	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_"))
+	if(!hname.Contains("_0_") && !hname.Contains("_1_") && !hname.Contains("_2_") && !hname.Contains("_3_") && !hname.Contains("_4_") && !hname.Contains("_5_") && !hname.Contains("_6_"))
 	{c->SaveAs(Form("%s/%s_%s.pdf",savepath.c_str(),vdtG.c_str(),hist->GetName()));}
 
     return tmp;
