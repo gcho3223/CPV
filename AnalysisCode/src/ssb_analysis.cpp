@@ -985,9 +985,9 @@ void ssb_analysis::Loop( char *logfile )
                   FillHisto( h_Num_bJets[5], nbtagged, evt_weight_ );
                   
                   FillHisto( h_HT[5], AllJetpt, evt_weight_);
-                  //////////////////////////////////////////////////////////////////// new algorithm start ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////// new algorithm start ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //       << O3 version 1 >>                                                                                      //
+                  //       << New algorithm version 1 >>                                                                           //
                   //       - use 1 highest pT b-tagging jet among b-tagging jets, leading jet                                      //
                   //       - calcuate dR with b-tagging jet & lepton, Anti-lepton                                                  //
                   //       - if dR btw b-tagging jet & Lepton, b-tagging jet becomes anti-b-tagging jet vise versa                 //
@@ -1132,165 +1132,7 @@ void ssb_analysis::Loop( char *logfile )
                      }
                   }
                   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //       << Generator level >>                                                                                   //
-                  //       - find b quarks and muon came from mother particle (top)                                                //
-                  //       - because they(b & muon) has the same mother particle, regarded as they are already paired              //
-                  //       - with the same way, get O3 when dR is under 3                                                          //
-                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //SetGenLepAnLep();
-                  int mom1_bidx = -99;
-                  int mom2_bidx = -99;
-                  int mu_mom1_widx = -99;
-                  int mu_mom2_widx = -99;
-                  int mu_mom1_topidx = -99;
-                  int mu_mom2_topidx = -99;
-                  double Gen_dR_Genb_GenAnLep = 999.0;
-                  double Gen_dR_GenAnb_GenLep = 999.0;
-                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //                               start finding mother particle of b quark and muon                               //
-                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //    muon : 13         //    anti-muon : -13   //    electorn : 11  //    positrion : -11                       //
-                  //    W- boson : -24    //    W+ boson : 24                                                                      //
-                  //    top : 6           //    anti-top : -6                                                                      //
-                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //cout << "\n event number: " << jentry << endl;
-                  for(int ipdg=0; ipdg<GenPar_pdgId->size(); ipdg++) // find mother particle at generator level
-                  {
-                     //cout << "GenPar_pdgId loop: " << ipdg << endl;
-                     if(GenPar_pdgId->at(ipdg) == 13) // gen lv muon
-                     {
-                        mu_mom1_widx = GenPar_Mom1_Idx->at(ipdg);
-                        for(int iw=0; iw<GenPar_Idx->size(); iw++) //find W-
-                        {
-                           if(mu_mom1_widx == GenPar_Idx->at(iw))
-                           {
-                              mu_mom1_topidx = GenPar_Mom1_Idx->at(iw);
-                              for(int itop=0; itop<GenPar_Idx->size(); itop++) //find anti-top
-                              {
-                                 if(mu_mom1_topidx == GenPar_Idx->at(itop))
-                                 {
-                                    GenMu = (TLorentzVector*)GenPar->At(ipdg);
-                                    //cout << "muon?: " << GenPar_pdgId->at(ipdg) << ", W- boson?: " << GenPar_pdgId->at(iw) << ", anti-top?: " << GenPar_pdgId->at(itop) << endl;
-                                    FillHisto(h_GenMuon_pt     ,GenMu->Pt()     ,evt_weight_);
-                                    FillHisto(h_GenMuon_eta    ,GenMu->Eta()    ,evt_weight_);
-                                    FillHisto(h_GenMuon_phi    ,GenMu->Phi()    ,evt_weight_);
-                                 }//end top
-                              }//end top loop
-                           }//end w boson
-                        }//endl w boson loop
-                     }//end muon
-                     if(GenPar_pdgId->at(ipdg) == -13) // gen lv anti-muon
-                     {
-                        mu_mom2_widx = GenPar_Mom1_Idx->at(ipdg);
-                        for(int iw=0; iw<GenPar_Idx->size(); iw++) //find W+
-                        {
-                           if(mu_mom2_widx == GenPar_Idx->at(iw))
-                           {
-                              mu_mom2_topidx = GenPar_Mom1_Idx->at(iw);
-                              for(int itop=0; itop<GenPar_Idx->size(); itop++) //find anti-top
-                              {
-                                 if(mu_mom2_topidx == GenPar_Idx->at(itop))
-                                 {
-                                    GenAnMu = (TLorentzVector*)GenPar->At(ipdg);
-                                    //cout << "anti muon?: " << GenPar_pdgId->at(ipdg) << ", W+ boson?: " << GenPar_pdgId->at(iw) << ", top?: " << GenPar_pdgId->at(itop) << endl;
-                                    FillHisto(h_GenAnMuon_pt   ,GenAnMu->Pt()   ,evt_weight_);
-                                    FillHisto(h_GenAnMuon_eta  ,GenAnMu->Eta()  ,evt_weight_);
-                                    FillHisto(h_GenAnMuon_phi  ,GenAnMu->Phi()  ,evt_weight_);
-                                 }//end top
-                              }//end top loop
-                           }//end w boson
-                        }//endl w boson loop
-                     }//end muon
-                     if(GenPar_pdgId->at(ipdg) == 5) // gen lv b quark
-                     {
-                        mom1_bidx = GenPar_Mom1_Idx->at(ipdg); // obtain the index of mother particle of pdgid 5 that is b jet
-                        for(int itop=0; itop<GenPar_Idx->size(); itop++) // compare mom_idx with GenPar_Idx
-                        {
-                           if(mom1_bidx == GenPar_Idx->at(itop)) // if value of index of both is same, check pdgid whether it is top or not using iteration number
-                           {
-                              //cout << "=================== b =================" << endl;
-                              //cout << "GenPar_pdgId: " << GenPar_pdgId->at(ipdg) << ", ipdg: " << ipdg << ", itop: " << itop << ", mom1 idx: " << mom1_bidx << ", Genpar_Idx: " << GenPar_Idx->at(itop) << endl;
-                              //cout << "mother1 particle(GenPar_pdgId): " << GenPar_pdgId->at(itop) << endl;
-                              //cout << "b?: " << GenPar_pdgId->at(ipdg) << ", top?: " << GenPar_pdgId->at(itop) << endl;
-                              Genb = (TLorentzVector*)GenPar->At(ipdg); // at the moment, b quark came from top is named Gen lv bjet
-                              FillHisto(h_Genb_pt     ,Genb->Pt()    ,evt_weight_);
-                              FillHisto(h_Genb_eta    ,Genb->Eta()   ,evt_weight_);
-                              FillHisto(h_Genb_phi    ,Genb->Phi()   ,evt_weight_);
-                           }
-                        }
-                     }
-                     if(GenPar_pdgId->at(ipdg) == -5) // gen lv anti bjet
-                     {
-                        mom2_bidx = GenPar_Mom1_Idx->at(ipdg);
-                        for(int itop=0; itop<GenPar_Idx->size(); itop++)
-                        {
-                           if(mom2_bidx == GenPar_Idx->at(itop))
-                           {
-                              //cout << "=================== anti b =================" << endl;
-                              //cout << "GenPar_pdgId: " << GenPar_pdgId->at(ipdg) << ", ipdg: " << ipdg << ", itop: " << itop << ", mom2 idx: " << mom2_bidx << ", Genpar_Idx: " << GenPar_Idx->at(itop) << endl;
-                              //cout << "mother2 particle(GenPar_pdgId): " << GenPar_pdgId->at(itop) << endl;
-                              //cout << "anti-b?: " << GenPar_pdgId->at(ipdg) << ", anti-top?: " << GenPar_pdgId->at(itop) << endl;
-                              GenAnb = (TLorentzVector*)GenPar->At(ipdg);
-                              FillHisto(h_GenAnb_pt   ,GenAnb->Pt()   ,evt_weight_);
-                              FillHisto(h_GenAnb_eta  ,GenAnb->Eta()  ,evt_weight_);
-                              FillHisto(h_GenAnb_phi  ,GenAnb->Phi()  ,evt_weight_);
-                           }
-                        }
-                     }
-                  }//end finding mother particle
-                  if(GenMu && GenAnMu && Genb && GenAnb)
-                  {
-                     Gen_dR_Genb_GenAnLep = Genb->DeltaR(*((TLorentzVector*)GenAnMu));
-                     Gen_dR_GenAnb_GenLep = GenAnb->DeltaR(*((TLorentzVector*)GenMu));
-                     FillHisto(h_Gen_dR_Genb_GenAnLep    ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
-                     FillHisto(h_Gen_dR_GenAnb_GenLep    ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
-                     FillHisto(h_Gen_dR_Genb_GenAnb      ,Gen_dR_GenAnb_GenLep  ,Gen_dR_Genb_GenAnLep    ,evt_weight_);
-                     if(Gen_dR_Genb_GenAnLep < 3 && Gen_dR_GenAnb_GenLep < 3)
-                     {
-                        FillHisto(h_Gen_dR3_pair_Genb_GenAnLep ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
-                        FillHisto(h_Gen_dR3_pair_GenAnb_GenLep ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
-                        FillHisto(h_Gen_dR3_af_Genb_GenAnb     ,Gen_dR_GenAnb_GenLep ,Gen_dR_Genb_GenAnLep  ,evt_weight_);
-                        FillHisto(h_Pair_Genbpt                ,Genb->Pt()           ,evt_weight_);
-                        FillHisto(h_Pair_Genbeta               ,Genb->Eta()          ,evt_weight_);
-                        FillHisto(h_Pair_Genbphi               ,Genb->Phi()          ,evt_weight_);
-                        FillHisto(h_Pair_GenAnbpt              ,GenAnb->Pt()         ,evt_weight_);
-                        FillHisto(h_Pair_GenAnbeta             ,GenAnb->Eta()        ,evt_weight_);
-                        FillHisto(h_Pair_GenAnbphi             ,GenAnb->Phi()        ,evt_weight_);
-                        FillHisto(h_pair_GenMupt               ,GenMu->Pt()          ,evt_weight_);
-                        FillHisto(h_pair_GenMueta              ,GenMu->Eta()         ,evt_weight_);
-                        FillHisto(h_pair_GenMuphi              ,GenMu->Phi()         ,evt_weight_);
-                        FillHisto(h_pair_GenAnMupt             ,GenAnMu->Pt()        ,evt_weight_);
-                        FillHisto(h_pair_GenAnMueta            ,GenAnMu->Eta()       ,evt_weight_);
-                        FillHisto(h_pair_GenAnMuphi            ,GenAnMu->Phi()       ,evt_weight_);
-                        
-                        //invariant mass distribution
-                        // 1) (An)bJet - (An)Mu
-                        FillHisto(h_pair_Gen_b_Anb_Mass  , ( (*Genb)+(*GenAnb) ).M()   , evt_weight_ );
-                        FillHisto(h_pair_Gen_Mu_AnMu_Mass, ( (*GenMu)+(*GenAnMu) ).M() , evt_weight_ );
-                        // 2) bJet - AnbJet , Mu - AnMu
-                        FillHisto(h_pair_Gen_b_AnMu_Mass , ( (*Genb)+(*GenAnMu) ).M()  , evt_weight_ );
-                        FillHisto(h_pair_Gen_Anb_Mu_Mass , ( (*GenAnb)+(*GenMu) ).M()  , evt_weight_ );
-                        //cout << "invariant mass: b-b: " << ( (*Genb)+(*GenAnb) ).M() << ", mu-mu: " << ( (*GenMu)+(*GenAnMu) ).M() << ", b-anmu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anb-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
-                        // 3) b & anti-b, Mu & anti-mu mass
-                        FillHisto(h_pair_Gen_b_Mass       ,(*Genb).M()       ,evt_weight_ );
-                        FillHisto(h_pair_Gen_Anb_Mass     ,(*GenAnb).M()     ,evt_weight_ );
-                        FillHisto(h_pair_Gen_Mu_Mass      ,(*GenMu).M()      ,evt_weight_ );
-                        FillHisto(h_pair_Gen_AnMu_Mass    ,(*GenAnMu).M()    ,evt_weight_ );
-                        //cout << "Gen" << endl;
-                        //cout << "b: " << (*Genb).M() << ", anti-b: " << (*GenAnb).M() << ", mu: " << (*GenMu).M() << ", anti-mu: " << (*GenAnMu).M() << endl;
-                        //cout << "b-anti-mu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anti-b-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
-                        // calculate O3
-                        double n_GencpO3 = ssbcpviol->getO3Vari( Genb , GenAnb, GenAnMu, GenMu );
-                        if (n_GencpO3 == 0.0 ) {cout << "--GEN: 00000000000000--: " << n_GencpO3 << endl;}
-                        // Calculating O3 error.
-                        if (n_GencpO3 > 0.0) {FillHisto(h_GenCPO3_Pos   ,n_GencpO3    ,evt_weight_);}
-                        else                 {FillHisto(h_GenCPO3_Neg   ,n_GencpO3    ,evt_weight_);}
-                        FillHisto(h_GenCPO3_bfReco          ,n_GencpO3 ,evt_weight_);
-                        FillHisto(h_GenCPO3_bfReco_ReRange  ,n_GencpO3 ,evt_weight_);
-                     }
-                  }
-                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //       << O3 version 2 >>                                                                                      //
+                  //       << New algorithm version 2 >>                                                                           //
                   //       - use all jets                                                                                          //
                   //       - calcuate dR with jet & (anti-)lepton then, save the values                                            //
                   //       - find jet idx that has minimum dR with (anti-)lepton                                                   //
@@ -1484,6 +1326,164 @@ void ssb_analysis::Loop( char *logfile )
                      else                 {FillHisto(h_v2_CPO3_Neg  ,n_cpO3_v2  ,evt_weight_);}
                      FillHisto(h_v2_CPO3_bfReco          ,n_cpO3_v2  ,evt_weight_);
                      FillHisto(h_v2_CPO3_bfReco_ReRange  ,n_cpO3_v2  ,evt_weight_);
+                  }
+                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  //       << Generator level >>                                                                                   //
+                  //       - find b quarks and muon came from mother particle (top)                                                //
+                  //       - because they(b & muon) has the same mother particle, regarded as they are already paired              //
+                  //       - with the same way, get O3 when dR is under 3                                                          //
+                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  //SetGenLepAnLep();
+                  int mom1_bidx = -99;
+                  int mom2_bidx = -99;
+                  int mu_mom1_widx = -99;
+                  int mu_mom2_widx = -99;
+                  int mu_mom1_topidx = -99;
+                  int mu_mom2_topidx = -99;
+                  double Gen_dR_Genb_GenAnLep = 999.0;
+                  double Gen_dR_GenAnb_GenLep = 999.0;
+                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  //                               start finding mother particle of b quark and muon                               //
+                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  //    muon : 13         //    anti-muon : -13   //    electorn : 11  //    positrion : -11                       //
+                  //    W- boson : -24    //    W+ boson : 24                                                                      //
+                  //    top : 6           //    anti-top : -6                                                                      //
+                  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  //cout << "\n event number: " << jentry << endl;
+                  for(int ipdg=0; ipdg<GenPar_pdgId->size(); ipdg++) // find mother particle at generator level
+                  {
+                     //cout << "GenPar_pdgId loop: " << ipdg << endl;
+                     if(GenPar_pdgId->at(ipdg) == 13) // gen lv muon
+                     {
+                        mu_mom1_widx = GenPar_Mom1_Idx->at(ipdg);
+                        for(int iw=0; iw<GenPar_Idx->size(); iw++) //find W-
+                        {
+                           if(mu_mom1_widx == GenPar_Idx->at(iw))
+                           {
+                              mu_mom1_topidx = GenPar_Mom1_Idx->at(iw);
+                              for(int itop=0; itop<GenPar_Idx->size(); itop++) //find anti-top
+                              {
+                                 if(mu_mom1_topidx == GenPar_Idx->at(itop))
+                                 {
+                                    GenMu = (TLorentzVector*)GenPar->At(ipdg);
+                                    //cout << "muon?: " << GenPar_pdgId->at(ipdg) << ", W- boson?: " << GenPar_pdgId->at(iw) << ", anti-top?: " << GenPar_pdgId->at(itop) << endl;
+                                    FillHisto(h_GenMuon_pt     ,GenMu->Pt()     ,evt_weight_);
+                                    FillHisto(h_GenMuon_eta    ,GenMu->Eta()    ,evt_weight_);
+                                    FillHisto(h_GenMuon_phi    ,GenMu->Phi()    ,evt_weight_);
+                                 }//end top
+                              }//end top loop
+                           }//end w boson
+                        }//endl w boson loop
+                     }//end muon
+                     if(GenPar_pdgId->at(ipdg) == -13) // gen lv anti-muon
+                     {
+                        mu_mom2_widx = GenPar_Mom1_Idx->at(ipdg);
+                        for(int iw=0; iw<GenPar_Idx->size(); iw++) //find W+
+                        {
+                           if(mu_mom2_widx == GenPar_Idx->at(iw))
+                           {
+                              mu_mom2_topidx = GenPar_Mom1_Idx->at(iw);
+                              for(int itop=0; itop<GenPar_Idx->size(); itop++) //find anti-top
+                              {
+                                 if(mu_mom2_topidx == GenPar_Idx->at(itop))
+                                 {
+                                    GenAnMu = (TLorentzVector*)GenPar->At(ipdg);
+                                    //cout << "anti muon?: " << GenPar_pdgId->at(ipdg) << ", W+ boson?: " << GenPar_pdgId->at(iw) << ", top?: " << GenPar_pdgId->at(itop) << endl;
+                                    FillHisto(h_GenAnMuon_pt   ,GenAnMu->Pt()   ,evt_weight_);
+                                    FillHisto(h_GenAnMuon_eta  ,GenAnMu->Eta()  ,evt_weight_);
+                                    FillHisto(h_GenAnMuon_phi  ,GenAnMu->Phi()  ,evt_weight_);
+                                 }//end top
+                              }//end top loop
+                           }//end w boson
+                        }//endl w boson loop
+                     }//end muon
+                     if(GenPar_pdgId->at(ipdg) == 5) // gen lv b quark
+                     {
+                        mom1_bidx = GenPar_Mom1_Idx->at(ipdg); // obtain the index of mother particle of pdgid 5 that is b jet
+                        for(int itop=0; itop<GenPar_Idx->size(); itop++) // compare mom_idx with GenPar_Idx
+                        {
+                           if(mom1_bidx == GenPar_Idx->at(itop)) // if value of index of both is same, check pdgid whether it is top or not using iteration number
+                           {
+                              //cout << "=================== b =================" << endl;
+                              //cout << "GenPar_pdgId: " << GenPar_pdgId->at(ipdg) << ", ipdg: " << ipdg << ", itop: " << itop << ", mom1 idx: " << mom1_bidx << ", Genpar_Idx: " << GenPar_Idx->at(itop) << endl;
+                              //cout << "mother1 particle(GenPar_pdgId): " << GenPar_pdgId->at(itop) << endl;
+                              //cout << "b?: " << GenPar_pdgId->at(ipdg) << ", top?: " << GenPar_pdgId->at(itop) << endl;
+                              Genb = (TLorentzVector*)GenPar->At(ipdg); // at the moment, b quark came from top is named Gen lv bjet
+                              FillHisto(h_Genb_pt     ,Genb->Pt()    ,evt_weight_);
+                              FillHisto(h_Genb_eta    ,Genb->Eta()   ,evt_weight_);
+                              FillHisto(h_Genb_phi    ,Genb->Phi()   ,evt_weight_);
+                           }
+                        }
+                     }
+                     if(GenPar_pdgId->at(ipdg) == -5) // gen lv anti bjet
+                     {
+                        mom2_bidx = GenPar_Mom1_Idx->at(ipdg);
+                        for(int itop=0; itop<GenPar_Idx->size(); itop++)
+                        {
+                           if(mom2_bidx == GenPar_Idx->at(itop))
+                           {
+                              //cout << "=================== anti b =================" << endl;
+                              //cout << "GenPar_pdgId: " << GenPar_pdgId->at(ipdg) << ", ipdg: " << ipdg << ", itop: " << itop << ", mom2 idx: " << mom2_bidx << ", Genpar_Idx: " << GenPar_Idx->at(itop) << endl;
+                              //cout << "mother2 particle(GenPar_pdgId): " << GenPar_pdgId->at(itop) << endl;
+                              //cout << "anti-b?: " << GenPar_pdgId->at(ipdg) << ", anti-top?: " << GenPar_pdgId->at(itop) << endl;
+                              GenAnb = (TLorentzVector*)GenPar->At(ipdg);
+                              FillHisto(h_GenAnb_pt   ,GenAnb->Pt()   ,evt_weight_);
+                              FillHisto(h_GenAnb_eta  ,GenAnb->Eta()  ,evt_weight_);
+                              FillHisto(h_GenAnb_phi  ,GenAnb->Phi()  ,evt_weight_);
+                           }
+                        }
+                     }
+                  }//end finding mother particle
+                  if(GenMu && GenAnMu && Genb && GenAnb)
+                  {
+                     Gen_dR_Genb_GenAnLep = Genb->DeltaR(*((TLorentzVector*)GenAnMu));
+                     Gen_dR_GenAnb_GenLep = GenAnb->DeltaR(*((TLorentzVector*)GenMu));
+                     FillHisto(h_Gen_dR_Genb_GenAnLep    ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
+                     FillHisto(h_Gen_dR_GenAnb_GenLep    ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
+                     FillHisto(h_Gen_dR_Genb_GenAnb      ,Gen_dR_GenAnb_GenLep  ,Gen_dR_Genb_GenAnLep    ,evt_weight_);
+                     if(Gen_dR_Genb_GenAnLep < 3 && Gen_dR_GenAnb_GenLep < 3)
+                     {
+                        FillHisto(h_Gen_dR3_pair_Genb_GenAnLep ,Gen_dR_Genb_GenAnLep   ,evt_weight_);
+                        FillHisto(h_Gen_dR3_pair_GenAnb_GenLep ,Gen_dR_GenAnb_GenLep   ,evt_weight_);
+                        FillHisto(h_Gen_dR3_af_Genb_GenAnb     ,Gen_dR_GenAnb_GenLep ,Gen_dR_Genb_GenAnLep  ,evt_weight_);
+                        FillHisto(h_Pair_Genbpt                ,Genb->Pt()           ,evt_weight_);
+                        FillHisto(h_Pair_Genbeta               ,Genb->Eta()          ,evt_weight_);
+                        FillHisto(h_Pair_Genbphi               ,Genb->Phi()          ,evt_weight_);
+                        FillHisto(h_Pair_GenAnbpt              ,GenAnb->Pt()         ,evt_weight_);
+                        FillHisto(h_Pair_GenAnbeta             ,GenAnb->Eta()        ,evt_weight_);
+                        FillHisto(h_Pair_GenAnbphi             ,GenAnb->Phi()        ,evt_weight_);
+                        FillHisto(h_pair_GenMupt               ,GenMu->Pt()          ,evt_weight_);
+                        FillHisto(h_pair_GenMueta              ,GenMu->Eta()         ,evt_weight_);
+                        FillHisto(h_pair_GenMuphi              ,GenMu->Phi()         ,evt_weight_);
+                        FillHisto(h_pair_GenAnMupt             ,GenAnMu->Pt()        ,evt_weight_);
+                        FillHisto(h_pair_GenAnMueta            ,GenAnMu->Eta()       ,evt_weight_);
+                        FillHisto(h_pair_GenAnMuphi            ,GenAnMu->Phi()       ,evt_weight_);
+                        
+                        //invariant mass distribution
+                        // 1) (An)bJet - (An)Mu
+                        FillHisto(h_pair_Gen_b_Anb_Mass  , ( (*Genb)+(*GenAnb) ).M()   , evt_weight_ );
+                        FillHisto(h_pair_Gen_Mu_AnMu_Mass, ( (*GenMu)+(*GenAnMu) ).M() , evt_weight_ );
+                        // 2) bJet - AnbJet , Mu - AnMu
+                        FillHisto(h_pair_Gen_b_AnMu_Mass , ( (*Genb)+(*GenAnMu) ).M()  , evt_weight_ );
+                        FillHisto(h_pair_Gen_Anb_Mu_Mass , ( (*GenAnb)+(*GenMu) ).M()  , evt_weight_ );
+                        //cout << "invariant mass: b-b: " << ( (*Genb)+(*GenAnb) ).M() << ", mu-mu: " << ( (*GenMu)+(*GenAnMu) ).M() << ", b-anmu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anb-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
+                        // 3) b & anti-b, Mu & anti-mu mass
+                        FillHisto(h_pair_Gen_b_Mass       ,(*Genb).M()       ,evt_weight_ );
+                        FillHisto(h_pair_Gen_Anb_Mass     ,(*GenAnb).M()     ,evt_weight_ );
+                        FillHisto(h_pair_Gen_Mu_Mass      ,(*GenMu).M()      ,evt_weight_ );
+                        FillHisto(h_pair_Gen_AnMu_Mass    ,(*GenAnMu).M()    ,evt_weight_ );
+                        //cout << "Gen" << endl;
+                        //cout << "b: " << (*Genb).M() << ", anti-b: " << (*GenAnb).M() << ", mu: " << (*GenMu).M() << ", anti-mu: " << (*GenAnMu).M() << endl;
+                        //cout << "b-anti-mu: " << ( (*Genb)+(*GenAnMu) ).M() << ", anti-b-mu: " << ( (*GenAnb)+(*GenMu) ).M() << endl;
+                        // calculate O3
+                        double n_GencpO3 = ssbcpviol->getO3Vari( Genb , GenAnb, GenAnMu, GenMu );
+                        if (n_GencpO3 == 0.0 ) {cout << "--GEN: 00000000000000--: " << n_GencpO3 << endl;}
+                        // Calculating O3 error.
+                        if (n_GencpO3 > 0.0) {FillHisto(h_GenCPO3_Pos   ,n_GencpO3    ,evt_weight_);}
+                        else                 {FillHisto(h_GenCPO3_Neg   ,n_GencpO3    ,evt_weight_);}
+                        FillHisto(h_GenCPO3_bfReco          ,n_GencpO3 ,evt_weight_);
+                        FillHisto(h_GenCPO3_bfReco_ReRange  ,n_GencpO3 ,evt_weight_);
+                     }
                   }
 //////////////////////////////////////////////////////////////////// end new algorithm ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
