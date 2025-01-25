@@ -31,18 +31,18 @@ samplelist = [
     #["WJetsToLNu","120"],
     #["WW","81"],
     #["WZ","41"],
-    #["ZZ","2"],
+    ["ZZ","21"],
     ### CPV Sample ###
-    ["TTJets_Signal_dtG_0","30"],
-    ["TTJets_Signal_dtG_0p5207","31"],
-    ["TTJets_Signal_dtG_1p0415","30"],
-    ["TTJets_Signal_dtG_2p60364","30"],
-    ["TTJets_Signal_dtG_m0p5207","31"],
-    ["TTJets_Signal_dtG_m1p0415","30"],
-    ["TTJets_Signal_dtG_m2p60364","30"]
+    #["TTJets_Signal_dtG_0","30"],
+    #["TTJets_Signal_dtG_0p5207","31"],
+    #["TTJets_Signal_dtG_1p0415","30"],
+    #["TTJets_Signal_dtG_2p60364","30"],
+    #["TTJets_Signal_dtG_m0p5207","31"],
+    #["TTJets_Signal_dtG_m1p0415","30"],
+    #["TTJets_Signal_dtG_m2p60364","30"]
 ]
 
-version = "v6_O3v2_3"
+version = "v6_O3v2_3_dR"
 
 
 for sample in range(len(samplelist)):
@@ -95,7 +95,7 @@ for sample in range(len(samplelist)):
             file.write("request_memory = 3072 MB \n\n") ## MC samples
         file.write("should_transfer_files = YES \n")
         file.write("when_to_transfer_output = ON_EXIT \n\n")
-        file.write('Requirements = (machine =!= "cluster291.knu.ac.kr") && (TARGET.Arch == "X86_64") && (TARGET.OpSys == "LINUX") && (TARGET.HasFileTransfer)\n')
+        file.write('Requirements = (machine =!= "cluster294.knu.ac.kr") && (TARGET.Arch == "X86_64") && (TARGET.OpSys == "LINUX") && (TARGET.HasFileTransfer)\n')
         file.write("output = /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/Condor/%s/%s/log_condor/out/out_$(Process).out \n" %(jobversion, samplelist[sample][0]) )
         file.write("error  = /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/Condor/%s/%s/log_condor/err/err_$(Process).err \n" %(jobversion, samplelist[sample][0]) )
         file.write("log    = /u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/Condor/%s/%s/log_condor/log/log_$(Process).log \n\n" %(jobversion, samplelist[sample][0]) )
