@@ -20,8 +20,9 @@
 #include "TPad.h"
 #include "TLatex.h"
 #include "toDrawHist.h"
+#include "CPVari.C"
 
-struct CPVari
+/*struct CPVari
 {
     double asym_ = 0.;
     double asym_err_ = -999.;
@@ -32,7 +33,7 @@ struct CPVari
     double num_m_err_ = -999.;
     double f_m_ = 0.;
     double num_total_ = 0.;
-};
+};*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //	iscpv = "cpv" or "data"					   														//
 //	data option include MC and data(data_doublemuon, data_singlemuon, DY, ST, TTV, Diboson, Data)	//
@@ -342,7 +343,7 @@ void Draw2DHist(TH2D *h_obj2D, string version, string sample, ostream &fout3d, s
 
 	delete c;
 }
-CPVari O3Asym(TH1D *hist)
+/*CPVari O3Asym(TH1D *hist)
 {
     CPVari tmp;
 
@@ -401,7 +402,7 @@ CPVari O3Asym(TH1D *hist)
     tmp.num_total_ = total;
 
     return tmp;
-}
+}*/
 void DrawOverflowBin(TH1D *his, double min, double max)
 {
     double contentUnder = 0;
