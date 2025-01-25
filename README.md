@@ -68,7 +68,7 @@ The code and scripts included here are for the dilepton channel of the top quark
     ```
     - if you need to submit the job again, command is
     ```
-    ./submit_condor.sh re
+    ./submit_condor.sh re or ./submit_condor.sh -r
     ```
 - **Create_CondorJob.py**: script for creating the condor job
     - if you need to create the condor job again, you can run this script
