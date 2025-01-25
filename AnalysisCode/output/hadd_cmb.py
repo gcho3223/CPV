@@ -4,7 +4,7 @@ import os
 ##### get current path #####
 print(os.getcwd())
 ##### define source file path #####
-version = "v6_O3v2_3"
+version = "v6_O3v2_3_dR"
 originPath = f"/u/user/gcho/TopPhysics/CPV/CMSSW_8_0_26_patch1/src/TOP-18-007/SSBAnalysis/AnalysisCode/output/Job_Version/{version}/Dataset"
 ##### hadd list #####
 samplelist = [
@@ -116,6 +116,6 @@ for idata in range(2):
     datacp = f'cp -v {originPath}/{cmbname[idata]}/{cmbname[idata]}.root ./'
     os.system(datacp)
     os.system('rm Data.root')
-    os.system('hadd Data.root *.root')
+    os.system('hadd Data.root *Muon.root')
 
 print('Done! check the files')
