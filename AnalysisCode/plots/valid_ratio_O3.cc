@@ -28,51 +28,55 @@ vector<string> samplelist = {
     "WW","WZ","ZZ", //29
     "Data"
 };
-string hO3  = "h_Reco_CPO3";
-void valid_ratio_O3()
+void valid_ratio_O3(string version)
 {
-    void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list, string dir);
+    //void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list, string dir); //single&double included
+    void ForData(TH1D *h_Data,TH1D *h_CPV, string list, string dir, string hO3); // combined data
     void DrawOverflowBin(TH1D *his, double min, double max);
     CPVari O3Asym(TH1D *hist);
     CPVari tmp;
 
-    std::string dir = "./valid_v3";
+    std::string dir = Form("./Job_Version/%s/",version.c_str());
     gSystem->mkdir(Form("%s",dir.c_str()), kTRUE);
 
-    std::string totalEventCountFilename = dir + "/TotalEventCount_v3_O3.txt";
+    std::string totalEventCountFilename = dir + "/Compare_O3Asym.txt";
     std::ofstream totalEventCountFile(totalEventCountFilename);
 
-    gSystem->mkdir(Form("%s/step_1",dir.c_str()), kTRUE);
+    string hO3  = "h_Reco_CPO3";
+
+    gSystem->mkdir(Form("%s",dir.c_str()), kTRUE);
     for(int sampleIndex = 0; sampleIndex < samplelist.size(); sampleIndex++)
     {
         if(samplelist[sampleIndex] == "Data")
         {
-            TFile *fileRepro_Single = new TFile(Form("../output/Repro_v1/Data/Data_SingleMuon.root"), "READ");
-            TFile *fileRepro_Double = new TFile(Form("../output/Repro_v1/Data/Data_DoubleMuon.root"), "READ");
-            TFile *fileRepro_Data = new TFile(Form("../output/Repro_v1/Data/Data.root"), "READ");
+            //TFile *fileRepro_Single = new TFile(Form("../output/Job_Version/%s/Dataset/Data_SingleMuon/Data_SingleMuon.root",version.c_str()), "READ");
+            //TFile *fileRepro_Double = new TFile(Form("../output/Job_Version/%s/Dataset/Data_DoubleMuon/Data_DoubleMuon.root",version.c_str()), "READ");
+            TFile *fileRepro_Data = new TFile(Form("../output/Job_Version/%s/Dataset/Data/Data.root",version.c_str()), "READ");
             TFile *fileCPV = new TFile(Form("../output/Validation/CPV_MuMu/Data.root"), "READ");
 
-            TH1D *hRepro_Single = (TH1D*)fileRepro_Single->Get(Form("%s",hO3.c_str()));
-            TH1D *hRepro_Double = (TH1D*)fileRepro_Double->Get(Form("%s",hO3.c_str()));
+            //TH1D *hRepro_Single = (TH1D*)fileRepro_Single->Get(Form("%s",hO3.c_str()));
+            //TH1D *hRepro_Double = (TH1D*)fileRepro_Double->Get(Form("%s",hO3.c_str()));
             TH1D *hRepro_Data = (TH1D*)fileRepro_Data->Get(Form("%s",hO3.c_str()));
-            TH1D *hCPV = (TH1D*)fileCPV->Get(Form("%s",hO3.c_str()));
-            ForData(hRepro_Single,hRepro_Double,hRepro_Data,hCPV,samplelist[sampleIndex],dir);
+            TH1D *hCPV = (TH1D*)fileCPV->Get(Form("h_Reco_CPO3"));
+            //ForData(hRepro_Single,hRepro_Double,hRepro_Data,hCPV,samplelist[sampleIndex],dir);
+            if(hRepro_Data==nullptr || hCPV==nullptr) {cout << "hRepro_Data or hCPV is nullptr" << endl; continue;}
+            ForData(hRepro_Data,hCPV,samplelist[sampleIndex],dir,hO3);
 
-            fileRepro_Single->Close();
-            fileRepro_Double->Close();
+            //fileRepro_Single->Close();
+            //fileRepro_Double->Close();
             fileRepro_Data->Close();
             fileCPV->Close();
-            delete fileRepro_Single;
-            delete fileRepro_Double;
+            //delete fileRepro_Single;
+            //delete fileRepro_Double;
             delete fileRepro_Data;
             delete fileCPV;
         }
-        TFile *fileRepro = new TFile(Form("../output/Repro_v1/%s/%s/%s_All.root", samplelist[sampleIndex].c_str(), samplelist[sampleIndex].c_str(), samplelist[sampleIndex].c_str()), "READ");
+        TFile *fileRepro = new TFile(Form("../output/Job_Version/%s/Dataset/%s/%s_All.root", version.c_str(), samplelist[sampleIndex].c_str(), samplelist[sampleIndex].c_str()), "READ");
         TFile *fileCPV = new TFile(Form("../output/Validation/CPV_MuMu/%s.root", samplelist[sampleIndex].c_str()), "READ");
         TCanvas *c1 = new TCanvas(Form("c1_%s_1", samplelist[sampleIndex].c_str()), "Validation Ratio Plot", 800, 800);
 
         TH1D *hRepro = (TH1D*)fileRepro->Get(Form("%s",hO3.c_str()));
-        TH1D *hCPV = (TH1D*)fileCPV->Get(Form("%s",hO3.c_str()));
+        TH1D *hCPV = (TH1D*)fileCPV->Get(Form("h_Reco_CPO3"));
 
         if(hRepro && hCPV)
         {
@@ -162,9 +166,9 @@ void valid_ratio_O3()
 
             totalEventCountFile << samplelist[sampleIndex] << " O3: Reproduce Events: " << Form("%.2f",hRepro->Integral()) << ", AN Events: " << Form("%.2f",hCPV->Integral()) << ", Ratio: " << Form("%.2f",hRepro->Integral()/hCPV->Integral()) << std::endl;
 
-            std::string subdir = dir + "/O3/" + samplelist[sampleIndex];
+            std::string subdir = Form("%s/O3/%s/",dir.c_str(),hO3.c_str());
             gSystem->mkdir(subdir.c_str(), kTRUE);
-            c1->Print(Form("%s/Valid_%s_%s.pdf",subdir.c_str(),samplelist[sampleIndex].c_str(),hO3.c_str()));
+            c1->Print(Form("%s/Compare_O3Asym_%s.pdf",subdir.c_str(),samplelist[sampleIndex].c_str()));
 
             fileRepro->Close();
             fileCPV->Close();
@@ -173,7 +177,8 @@ void valid_ratio_O3()
         }
     }
 }
-void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list, string dir)
+//void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list, string dir)
+void ForData(TH1D *h_Data,TH1D *h_CPV, string list, string dir, string hO3)
 {
     void DrawOverflowBin(TH1D *his, double min, double max);
     CPVari O3Asym(TH1D *hist);
@@ -193,29 +198,29 @@ void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list
     pad1->cd();
     h_Data->SetLineColor(kRed);
     h_Data->SetLineWidth(2);
-    h_Single->SetLineColor(kMagenta);
-    h_Single->SetLineWidth(2);
-    h_Double->SetLineColor(kBlue);
-    h_Double->SetLineWidth(2);
+    //h_Single->SetLineColor(kMagenta);
+    //h_Single->SetLineWidth(2);
+    //h_Double->SetLineColor(kBlue);
+    //h_Double->SetLineWidth(2);
     h_CPV->SetMarkerColor(kBlack);
     h_CPV->SetMarkerStyle(kFullCircle);
     h_CPV->SetMarkerSize(.75);
     h_Data->Draw("hist");
-    h_Single->Draw("hist same");
-    h_Double->Draw("hist same");
+    //h_Single->Draw("hist same");
+    //h_Double->Draw("hist same");
     h_CPV->Draw("P same");
     
     h_Data->SetStats(kFALSE);
-    h_Single->SetStats(kFALSE);
-    h_Double->SetStats(kFALSE);
+    //h_Single->SetStats(kFALSE);
+    //h_Double->SetStats(kFALSE);
     h_CPV->SetStats(kFALSE);
     h_Data->GetXaxis()->SetLabelSize(0);
-    h_Single->GetXaxis()->SetLabelSize(0);
-    h_Double->GetXaxis()->SetLabelSize(0);
+    //h_Single->GetXaxis()->SetLabelSize(0);
+    //h_Double->GetXaxis()->SetLabelSize(0);
     h_CPV->GetXaxis()->SetLabelSize(0);
     h_Data->SetTitle("");
-    h_Single->SetTitle("");
-    h_Double->SetTitle("");
+    //h_Single->SetTitle("");
+    //h_Double->SetTitle("");
     h_CPV->SetTitle("");
 
     tmp = O3Asym(h_Data);
@@ -244,59 +249,59 @@ void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list
     legendCPV->SetTextColor(kBlack);
     legendCPV->Draw();
 
-    tmp = O3Asym(h_Single);
-    TLegend *legendSingle = new TLegend(0.67, 0.45, 0.9, 0.6);
-    legendSingle->AddEntry(h_Single, "SingleMuon", "l");
-    legendSingle->AddEntry(h_Single, Form("Event: %.4f",tmp.num_total_), "");
-    legendSingle->AddEntry(h_Single, Form("N (O_{3} < 0): %.4f",tmp.num_m_), "");
-    legendSingle->AddEntry(h_Single, Form("N (O_{3} > 0): %.4f",tmp.num_p_), "");
-    legendSingle->AddEntry(h_Single, Form("Asym: %.5f",tmp.asym_), "");
-    legendSingle->SetLineColor(kMagenta);
-    legendSingle->SetTextFont(42);
-    legendSingle->SetTextSize(0.03);
-    legendSingle->SetTextColor(kMagenta);
-    legendSingle->Draw();
+    //tmp = O3Asym(h_Single);
+    //TLegend *legendSingle = new TLegend(0.67, 0.45, 0.9, 0.6);
+    //legendSingle->AddEntry(h_Single, "SingleMuon", "l");
+    //legendSingle->AddEntry(h_Single, Form("Event: %.4f",tmp.num_total_), "");
+    //legendSingle->AddEntry(h_Single, Form("N (O_{3} < 0): %.4f",tmp.num_m_), "");
+    //legendSingle->AddEntry(h_Single, Form("N (O_{3} > 0): %.4f",tmp.num_p_), "");
+    //legendSingle->AddEntry(h_Single, Form("Asym: %.5f",tmp.asym_), "");
+    //legendSingle->SetLineColor(kMagenta);
+    //legendSingle->SetTextFont(42);
+    //legendSingle->SetTextSize(0.03);
+    //legendSingle->SetTextColor(kMagenta);
+    //legendSingle->Draw();
 
-    tmp = O3Asym(h_Double);
-    TLegend *legendDouble = new TLegend(0.67, 0.3, 0.9, 0.45);
-    legendDouble->AddEntry(h_Double, "DoubleMuon", "l");
-    legendDouble->AddEntry(h_Double, Form("Event: %.4f",tmp.num_total_), "");
-    legendDouble->AddEntry(h_Double, Form("N (O_{3} < 0): %.4f",tmp.num_m_), "");
-    legendDouble->AddEntry(h_Double, Form("N (O_{3} > 0): %.4f",tmp.num_p_), "");
-    legendDouble->AddEntry(h_Double, Form("Asym: %.5f",tmp.asym_), "");
-    legendDouble->SetLineColor(kBlue);
-    legendDouble->SetTextFont(42);
-    legendDouble->SetTextSize(0.03);
-    legendDouble->SetTextColor(kBlue);
-    legendDouble->Draw();
+    //tmp = O3Asym(h_Double);
+    //TLegend *legendDouble = new TLegend(0.67, 0.3, 0.9, 0.45);
+    //legendDouble->AddEntry(h_Double, "DoubleMuon", "l");
+    //legendDouble->AddEntry(h_Double, Form("Event: %.4f",tmp.num_total_), "");
+    //legendDouble->AddEntry(h_Double, Form("N (O_{3} < 0): %.4f",tmp.num_m_), "");
+    //legendDouble->AddEntry(h_Double, Form("N (O_{3} > 0): %.4f",tmp.num_p_), "");
+    //legendDouble->AddEntry(h_Double, Form("Asym: %.5f",tmp.asym_), "");
+    //legendDouble->SetLineColor(kBlue);
+    //legendDouble->SetTextFont(42);
+    //legendDouble->SetTextSize(0.03);
+    //legendDouble->SetTextColor(kBlue);
+    //legendDouble->Draw();
 
     pad2->cd();
     pad2->SetGridy();
-    TH1D *hRatio_Single = (TH1D*)h_CPV->Clone("hRatio_Single");
-    hRatio_Single->Divide(h_Single);
-    hRatio_Single->SetTitle("");
-    hRatio_Single->GetXaxis()->SetLabelSize(0.07);
-    hRatio_Single->GetYaxis()->SetLabelSize(0.07);
-    hRatio_Single->GetYaxis()->SetRangeUser(0.5, 1.5);
-    hRatio_Single->GetYaxis()->SetNdivisions(10);
-    hRatio_Single->GetYaxis()->SetTitleOffset(1.5);
-    hRatio_Single->SetMarkerColor(kMagenta);
-    hRatio_Single->SetLineColor(kMagenta);
-    hRatio_Single->SetMarkerSize(0.5);
-    hRatio_Single->Draw("E");
+    //TH1D *hRatio_Single = (TH1D*)h_CPV->Clone("hRatio_Single");
+    //hRatio_Single->Divide(h_Single);
+    //hRatio_Single->SetTitle("");
+    //hRatio_Single->GetXaxis()->SetLabelSize(0.07);
+    //hRatio_Single->GetYaxis()->SetLabelSize(0.07);
+    //hRatio_Single->GetYaxis()->SetRangeUser(0.5, 1.5);
+    //hRatio_Single->GetYaxis()->SetNdivisions(10);
+    //hRatio_Single->GetYaxis()->SetTitleOffset(1.5);
+    //hRatio_Single->SetMarkerColor(kMagenta);
+    //hRatio_Single->SetLineColor(kMagenta);
+    //hRatio_Single->SetMarkerSize(0.5);
+    //hRatio_Single->Draw("E");
 
-    TH1D *hRatio_Double = (TH1D*)h_CPV->Clone("hRatio_Double");
-    hRatio_Double->Divide(h_Double);
-    hRatio_Double->SetTitle("");
-    hRatio_Double->GetXaxis()->SetLabelSize(0.07);
-    hRatio_Double->GetYaxis()->SetLabelSize(0.07);
-    hRatio_Double->GetYaxis()->SetRangeUser(0.5, 1.5);
-    hRatio_Double->GetYaxis()->SetNdivisions(10);
-    hRatio_Double->GetYaxis()->SetTitleOffset(1.5);
-    hRatio_Double->SetMarkerColor(kBlue);
-    hRatio_Double->SetLineColor(kBlue);
-    hRatio_Double->SetMarkerSize(0.5);
-    hRatio_Double->Draw("E same");
+    //TH1D *hRatio_Double = (TH1D*)h_CPV->Clone("hRatio_Double");
+    //hRatio_Double->Divide(h_Double);
+    //hRatio_Double->SetTitle("");
+    //hRatio_Double->GetXaxis()->SetLabelSize(0.07);
+    //hRatio_Double->GetYaxis()->SetLabelSize(0.07);
+    //hRatio_Double->GetYaxis()->SetRangeUser(0.5, 1.5);
+    //hRatio_Double->GetYaxis()->SetNdivisions(10);
+    //hRatio_Double->GetYaxis()->SetTitleOffset(1.5);
+    //hRatio_Double->SetMarkerColor(kBlue);
+    //hRatio_Double->SetLineColor(kBlue);
+    //hRatio_Double->SetMarkerSize(0.5);
+    //hRatio_Double->Draw("E same");
 
     TH1D *hRatio_Data = (TH1D*)h_CPV->Clone("hRatio_Data");
     hRatio_Data->Divide(h_Data);
@@ -309,22 +314,22 @@ void ForData(TH1D *h_Single,TH1D *h_Double,TH1D *h_Data,TH1D *h_CPV, string list
     hRatio_Data->SetLineColor(kRed);
     hRatio_Data->SetMarkerColor(kRed);
     hRatio_Data->SetMarkerSize(0.5);
-    hRatio_Data->Draw("E same");
+    hRatio_Data->Draw("E");
 
     DrawOverflowBin(h_Data, -2, 2);
-    DrawOverflowBin(h_Single, -2, 2);
-    DrawOverflowBin(h_Double, -2, 2);
-    DrawOverflowBin(hRatio_Single, -2, 2);
-    DrawOverflowBin(hRatio_Double, -2, 2);
+    //DrawOverflowBin(h_Single, -2, 2);
+    //DrawOverflowBin(h_Double, -2, 2);
+    //DrawOverflowBin(hRatio_Single, -2, 2);
+    //DrawOverflowBin(hRatio_Double, -2, 2);
     DrawOverflowBin(hRatio_Data, -2, 2);
     
     TLine *line = new TLine(-2, 1, 2, 1);
     line->SetLineColor(kRed);
     line->Draw();
 
-    std::string subdir = dir + "/O3/" + list;
+    std::string subdir = Form("%s/O3/%s/",dir.c_str(),hO3.c_str());
     gSystem->mkdir(subdir.c_str(), kTRUE);
-    c1->Print(Form("%s/Valid_%s.pdf",subdir.c_str(),list.c_str()));
+    c1->Print(Form("%s/Compare_O3Asym_%s.pdf",subdir.c_str(),list.c_str()));
 }
 CPVari O3Asym(TH1D *hist)
 {
