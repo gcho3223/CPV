@@ -11,12 +11,19 @@
 #include "TStyle.h"
 #include "TCanvas.h"
 #include "TLegend.h"
-//#include "TRatioPlot.h"
+#include "TFile.h"
+#include "TSystem.h"
 #include "CPVari.C"
+
+CPVari bgsumAsym, dataAsym, pure_dataAsym;
 
 void SubtractionBkg(string version, TString histname)
 {
-    string savepath = Form("Job_Version/%s/Dataset/Data/SubtractionBkg",version.c_str());
+    string savepath;
+    if (histname.Contains("CPO3")) {savepath = Form("Job_Version/%s/Dataset/Data/SubtractionBkg/O3",version.c_str());}
+    else if (histname.Contains("pt")) {savepath = Form("Job_Version/%s/Dataset/Data/SubtractionBkg/pT",version.c_str());}
+    else if (histname.Contains("eta")) {savepath = Form("Job_Version/%s/Dataset/Data/SubtractionBkg/eta",version.c_str());}
+    else if (histname.Contains("phi")) {savepath = Form("Job_Version/%s/Dataset/Data/SubtractionBkg/phi",version.c_str());}
     gSystem->mkdir(Form("%s/",savepath.c_str()),kTRUE);
 
     TString sSignal      = Form("../output/Job_Version/%s/Dataset/TTJets_Signal/TTJets_Signal_All.root",version.c_str());
@@ -150,39 +157,51 @@ void SubtractionBkg(string version, TString histname)
     stack_bgk->Add(bgsum);
     bgsum->SetFillColor(kGray);
 
-///// 1. overlay O3 with background and data /////
-
-    ///// subtraction background /////
+/////////////////////////////////////
+///// 0. subtraction background /////
+/////////////////////////////////////
     TH1D *pure_data = (TH1D*)stack_data->Clone();
     pure_data->Add(bgsum,-1);
-
-    ///// O3 asymmetry /////
-    // bg
-    CPVari bgsumAsym = O3Asym(bgsum);
-    cout << "Bkg: "; 
-    cout << "N_+: " << bgsumAsym.num_p_ << ", N_-: " << bgsumAsym.num_m_ << ", total: " << bgsumAsym.num_total_ << ", integ: " << bgsum->Integral() << ", Asym: " << bgsumAsym.asym_ << endl;
-    // data
-    CPVari dataAsym = O3Asym(stack_data);
-    cout << "Data: "; 
-    cout << "N_+: " << dataAsym.num_p_ << ", N_-: " << dataAsym.num_m_ << ", total: " << dataAsym.num_total_ << ", integ: " << stack_data->Integral() << ", Asym(bf): " << dataAsym.asym_ << endl;
-    // pure data
-    CPVari pure_dataAsym = O3Asym(pure_data);
-    cout << "pure data: "; 
-    cout << "N_+: " << pure_dataAsym.num_p_ << ", N_-: " << pure_dataAsym.num_m_ << ", total: " << pure_dataAsym.num_total_ << ", integ: " << pure_data->Integral() << ", Asym(bf): " << pure_dataAsym.asym_ << endl;
-
+///// 1. overlay O3 with background and data /////
     TCanvas *c_overlay = new TCanvas("c_overlay", "overlay for bkg & data", 800, 800);
     c_overlay->cd();
-    c_overlay->SetLogy();
 
+    if(histname.Contains("CPO3"))
+    {
+        ///// O3 asymmetry /////
+        // bg
+        c_overlay->SetLogy();
+        bgsumAsym = O3Asym(bgsum);
+        cout << "Bkg: "; 
+        cout << "N_+: " << bgsumAsym.num_p_ << ", N_-: " << bgsumAsym.num_m_ 
+             << ", total: " << bgsumAsym.num_total_ << ", integ: " << bgsum->Integral() 
+             << ", Asym: " << bgsumAsym.asym_ << endl;
+        // data
+        dataAsym = O3Asym(stack_data);
+        cout << "Data: "; 
+        cout << "N_+: " << dataAsym.num_p_ << ", N_-: " << dataAsym.num_m_ 
+             << ", total: " << dataAsym.num_total_ << ", integ: " << stack_data->Integral() 
+             << ", Asym(bf): " << dataAsym.asym_ << endl;
+        // pure data
+        pure_dataAsym = O3Asym(pure_data);
+        cout << "pure data: "; 
+        cout << "N_+: " << pure_dataAsym.num_p_ << ", N_-: " << pure_dataAsym.num_m_ 
+             << ", total: " << pure_dataAsym.num_total_ << ", integ: " << pure_data->Integral() 
+             << ", Asym(bf): " << pure_dataAsym.asym_ << endl;
+    }
     stack_data->Draw("P");
     stack_bgk->Draw("same hist");
+    if(histname.Contains("pt")) {stack_data->Rebin(5); bgsum->Rebin(5);}
+    else if(histname.Contains("eta")) {stack_data->Rebin(2); bgsum->Rebin(2);}
     stack_data->SetTitle("");
     stack_data->GetYaxis()->SetTitle("Entry");
     stack_data->GetYaxis()->SetTitleSize(0.03);
     stack_data->GetYaxis()->SetTitleOffset(1.4);
-    stack_data->GetXaxis()->SetRangeUser(-2, 2);
-    stack_data->GetXaxis()->SetTitle("O_{3}/m_{t}^{4}");
     stack_data->SetStats(0);
+    if(histname.Contains("CPO3")) {stack_data->GetXaxis()->SetTitle("O_{3}/m_{t}^{4}");}
+    else if(histname.Contains("pt")) {stack_data->GetXaxis()->SetTitle("#p_T");}
+    else if(histname.Contains("eta")) {stack_data->GetXaxis()->SetTitle("#eta");}
+    else if(histname.Contains("phi")) {stack_data->GetXaxis()->SetTitle("#phi");}
 
     TLegend *legend_overlay = c_overlay->BuildLegend(0.15, 0.65, 0.4, 0.85);
     legend_overlay->Clear();
@@ -190,11 +209,30 @@ void SubtractionBkg(string version, TString histname)
     legend_overlay->SetBorderSize(0);
     legend_overlay->SetTextSize(0.02);
     legend_overlay->AddEntry(stack_data, "Data", "p");
-    legend_overlay->AddEntry(stack_data, Form("Event: %.4f ", dataAsym.num_total_),"");
-    legend_overlay->AddEntry(stack_data, Form("Asym: %.4f #pm %.4f",dataAsym.asym_,dataAsym.asym_err_),"");
-    legend_overlay->AddEntry(stack_bgk, Form("Background"),"f");
-    legend_overlay->AddEntry(stack_bgk, Form("Event: %.4f ", bgsumAsym.num_total_),"");
-    legend_overlay->AddEntry(stack_bgk, Form("Asym(bkg): %.4f #pm %.4f",bgsumAsym.asym_,bgsumAsym.asym_err_),"");
+    if(histname.Contains("CPO3"))
+    {
+        legend_overlay->AddEntry(stack_data, Form("Event: %.4f ", dataAsym.num_total_),"");
+        legend_overlay->AddEntry(stack_data, Form("Asym: %.4f #pm %.4f", dataAsym.asym_, dataAsym.asym_err_),"");
+    }
+    else
+    {
+        legend_overlay->AddEntry(stack_data, Form("Event: %.4f ", stack_data->Integral()),"");
+        legend_overlay->AddEntry(stack_data, Form("Mean: %.4f ", stack_data->GetMean()),"");
+        legend_overlay->AddEntry(stack_data, Form("RMS: %.4f ", stack_data->GetRMS()),"");
+    }
+
+    legend_overlay->AddEntry(stack_bgk, "Background","f");
+    if(histname.Contains("CPO3"))
+    {
+        legend_overlay->AddEntry(stack_bgk, Form("Event: %.4f ", bgsumAsym.num_total_),"");
+        legend_overlay->AddEntry(stack_bgk, Form("Asym(bkg): %.4f #pm %.4f", bgsumAsym.asym_, bgsumAsym.asym_err_),"");
+    }
+    else
+    {
+        legend_overlay->AddEntry(stack_bgk, Form("Event: %.4f ", bgsum->Integral()),"");
+        legend_overlay->AddEntry(stack_bgk, Form("Mean: %.4f ", bgsum->GetMean()),"");
+        legend_overlay->AddEntry(stack_bgk, Form("RMS: %.4f ", bgsum->GetRMS()),"");
+    }
     legend_overlay->Draw();
 
 ///// 2. pure data O3 distribution /////
@@ -204,13 +242,21 @@ void SubtractionBkg(string version, TString histname)
     c_pure->SetLogy();
     
     pure_data->Draw("hist");
+    if(histname.Contains("pt")) {pure_data->Rebin(5);}
+    else if(histname.Contains("eta")) {pure_data->Rebin(2);}
 
     pure_data->SetTitle("");
     pure_data->GetYaxis()->SetTitle("Entry");
     pure_data->GetYaxis()->SetTitleSize(0.03);
     pure_data->GetYaxis()->SetTitleOffset(1.4);
-    pure_data->GetXaxis()->SetRangeUser(-2, 2);
-    pure_data->GetXaxis()->SetTitle("O_{3}/m_{t}^{4}");
+    if(histname.Contains("CPO3"))
+    {
+        pure_data->GetXaxis()->SetRangeUser(-2, 2);
+        pure_data->GetXaxis()->SetTitle("O_{3}/m_{t}^{4}");
+    }
+    else if(histname.Contains("pt")) {pure_data->GetXaxis()->SetTitle("#p_T");}
+    else if(histname.Contains("eta")) {pure_data->GetXaxis()->SetTitle("#eta");}
+    else if(histname.Contains("phi")) {pure_data->GetXaxis()->SetTitle("#phi");}
     pure_data->SetStats(0);
 
     TLegend *legend_pure = c_pure->BuildLegend(0.15, 0.7, 0.4, 0.85);
@@ -219,20 +265,55 @@ void SubtractionBkg(string version, TString histname)
     legend_pure->SetBorderSize(0);
     legend_pure->SetTextSize(0.02);
     legend_pure->AddEntry(pure_data, "Data", "f");
-    legend_pure->AddEntry(pure_data, Form("Event: %.4f ", pure_dataAsym.num_total_),"");
-    legend_pure->AddEntry(pure_data, Form("Asym: %.4f #pm %.4f",pure_dataAsym.asym_,pure_dataAsym.asym_err_),"");
+    if(histname.Contains("CPO3"))
+    {
+        legend_pure->AddEntry(pure_data, Form("Event: %.4f ", pure_dataAsym.num_total_),"");
+        legend_pure->AddEntry(pure_data, Form("Asym: %.4f #pm %.4f", pure_dataAsym.asym_, pure_dataAsym.asym_err_),"");
+    }
+    else
+    {
+        legend_pure->AddEntry(pure_data, Form("Event: %.4f ", pure_data->Integral()),"");
+        legend_pure->AddEntry(pure_data, Form("Mean: %.4f ", pure_data->GetMean()),"");
+        legend_pure->AddEntry(pure_data, Form("RMS: %.4f ", pure_data->GetRMS()),"");
+    }
     legend_pure->Draw();
 
-    DrawOverflowBin(stack_data, -2, 2);
-    DrawOverflowBin(bgsum, -2, 2);
-    c_overlay->SaveAs(Form("./%s/Overlay_%s.pdf", savepath.c_str(),hist_save_name.Data()));
-    c_pure->SaveAs(Form("./%s/PureData_%s.pdf", savepath.c_str(),hist_save_name.Data()));
+    if(histname.Contains("CPO3"))
+    {
+        DrawOverflowBin(stack_data, -2, 2); DrawOverflowBin(bgsum, -2, 2); DrawOverflowBin(pure_data, -2, 2);
+        c_overlay->SaveAs(Form("./%s/Overlay_%s.pdf", savepath.c_str(),hist_save_name.Data()));
+        c_pure->SaveAs(Form("./%s/PureData_%s.pdf", savepath.c_str(),hist_save_name.Data()));
+    }
+    else if(histname.Contains("pt"))
+    {
+        DrawOverflowBin(stack_data, 0, 200); DrawOverflowBin(bgsum, 0, 200); DrawOverflowBin(pure_data, 0, 200);
+        c_overlay->SaveAs(Form("./%s/Overlay_%s.pdf", savepath.c_str(),histname.Data()));
+        c_pure->SaveAs(Form("./%s/PureData_%s.pdf", savepath.c_str(),histname.Data()));
+    }
+    else if(histname.Contains("eta"))
+    {
+        DrawOverflowBin(stack_data, -3, 3); DrawOverflowBin(bgsum, -3, 3); DrawOverflowBin(pure_data, -3, 3);
+        c_overlay->SaveAs(Form("./%s/Overlay_%s.pdf", savepath.c_str(),histname.Data()));
+        c_pure->SaveAs(Form("./%s/PureData_%s.pdf", savepath.c_str(),histname.Data()));
+    }
+    else if(histname.Contains("phi"))
+    {
+        DrawOverflowBin(stack_data, -3.2, 3.2); DrawOverflowBin(bgsum, -3.2, 3.2); DrawOverflowBin(pure_data, -3.2, 3.2);
+        c_overlay->SaveAs(Form("./%s/Overlay_%s.pdf", savepath.c_str(),histname.Data()));
+        c_pure->SaveAs(Form("./%s/PureData_%s.pdf", savepath.c_str(),histname.Data()));
+    }
 
-    // save pure data as a root file
-    TFile *fpuredata = new TFile(Form("../output/Job_Version/%s/Dataset/Data/PureData_%s.root", version.c_str(),hist_save_name.Data()), "RECREATE");
+    // 2. Pure Data ROOT 파일에 저장 (공통 ROOT 파일 사용)
+    TString outputRootFile = Form("../output/Job_Version/%s/Dataset/Data/PureData_All.root", version.c_str());
+    TFile *fpuredata = TFile::Open(outputRootFile, "UPDATE");
+    if (!fpuredata || fpuredata->IsZombie()) {
+        fpuredata = new TFile(outputRootFile, "RECREATE");
+    }
+    pure_data->SetName(Form("PureData%s", histname.Data()));
     pure_data->Write();
     fpuredata->Close();
 }
+
 void DrawOverflowBin(TH1D *his, double min, double max) {
     double contentUnder = 0;
     double contentOver  = 0;
