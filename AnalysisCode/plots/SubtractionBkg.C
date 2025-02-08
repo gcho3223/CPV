@@ -175,19 +175,19 @@ void SubtractionBkg(string version, TString histname)
         cout << "Bkg: "; 
         cout << "N_+: " << bgsumAsym.num_p_ << ", N_-: " << bgsumAsym.num_m_ 
              << ", total: " << bgsumAsym.num_total_ << ", integ: " << bgsum->Integral() 
-             << ", Asym: " << bgsumAsym.asym_ << endl;
+             << ", Asym: " << bgsumAsym.asym_ << ", Asym err: " << bgsumAsym.asym_err_ << endl;
         // data
         dataAsym = O3Asym(stack_data);
         cout << "Data: "; 
         cout << "N_+: " << dataAsym.num_p_ << ", N_-: " << dataAsym.num_m_ 
              << ", total: " << dataAsym.num_total_ << ", integ: " << stack_data->Integral() 
-             << ", Asym(bf): " << dataAsym.asym_ << endl;
+             << ", Asym: " << dataAsym.asym_ << ", Asym err: " << dataAsym.asym_err_ << endl;
         // pure data
         pure_dataAsym = O3Asym(pure_data);
         cout << "pure data: "; 
         cout << "N_+: " << pure_dataAsym.num_p_ << ", N_-: " << pure_dataAsym.num_m_ 
              << ", total: " << pure_dataAsym.num_total_ << ", integ: " << pure_data->Integral() 
-             << ", Asym(bf): " << pure_dataAsym.asym_ << endl;
+             << ", Asym: " << pure_dataAsym.asym_ << ", Asym err: " << pure_dataAsym.asym_err_ << endl;
     }
     stack_data->Draw("P");
     stack_bgk->Draw("same hist");
@@ -239,7 +239,6 @@ void SubtractionBkg(string version, TString histname)
 
     TCanvas *c_pure = new TCanvas("c_pure", "pure data O3 distribution", 800, 800);
     c_pure->cd();
-    c_pure->SetLogy();
     
     pure_data->Draw("hist");
     if(histname.Contains("pt")) {pure_data->Rebin(5);}
@@ -251,6 +250,7 @@ void SubtractionBkg(string version, TString histname)
     pure_data->GetYaxis()->SetTitleOffset(1.4);
     if(histname.Contains("CPO3"))
     {
+        c_pure->SetLogy();
         pure_data->GetXaxis()->SetRangeUser(-2, 2);
         pure_data->GetXaxis()->SetTitle("O_{3}/m_{t}^{4}");
     }
@@ -309,8 +309,23 @@ void SubtractionBkg(string version, TString histname)
     if (!fpuredata || fpuredata->IsZombie()) {
         fpuredata = new TFile(outputRootFile, "RECREATE");
     }
+    
+    // pure_data 히스토그램의 이름을 변경 후 저장
     pure_data->SetName(Form("PureData%s", histname.Data()));
     pure_data->Write();
+    
+    // 캔버스에 그려진 레전드도 함께 저장 (먼저 이름을 설정하여 구분)
+    if(legend_overlay)
+    {
+        legend_overlay->SetName(Form("LegendOverlay%s", histname.Data()));
+        legend_overlay->Write();
+    }
+    if(legend_pure)
+    {
+        legend_pure->SetName(Form("LegendPure%s", histname.Data()));
+        legend_pure->Write();
+    }
+    
     fpuredata->Close();
 }
 
