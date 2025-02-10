@@ -999,8 +999,6 @@ class ssb_analysis : public SSBTree
 
       TH1D *h_bJetEnergy;
       TH1D *h_AnbJetEnergy;
-      TH1D *h_bJetPt;
-      TH1D *h_AnbJetPt;
 
       TH1D *h_Lep1Energy;
       TH1D *h_Lep2Energy;
@@ -1013,6 +1011,19 @@ class ssb_analysis : public SSBTree
 
       TH1D *h_NuEnergy;
       TH1D *h_AnNuEnergy;
+      // kinematics of objects after top reco
+      TH1D *h_bJetpt;
+      TH1D *h_bJeteta;
+      TH1D *h_bJetphi;
+      TH1D *h_AnbJetpt;
+      TH1D *h_AnbJeteta;
+      TH1D *h_AnbJetphi;
+      TH1D *h_Leppt;
+      TH1D *h_Lepeta;
+      TH1D *h_Lepphi;
+      TH1D *h_AnLeppt;
+      TH1D *h_AnLepeta;
+      TH1D *h_AnLepphi;
 
       TH1D *h_Reco_CPO_[13];
       TH1D *h_Reco_CPO_ReRange_[13];

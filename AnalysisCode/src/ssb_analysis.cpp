@@ -1996,12 +1996,23 @@ void ssb_analysis::Loop( char *logfile )
                   
                      FillHisto( h_bJetEnergy   , bJet->Energy()   , evt_weight_ );
                      FillHisto( h_AnbJetEnergy , AnbJet->Energy() , evt_weight_ );
-                     FillHisto( h_bJetPt       , bJet->Pt()   , evt_weight_ );
-                     FillHisto( h_AnbJetPt     , AnbJet->Pt() , evt_weight_ );
                      FillHisto( h_LepEnergy    , Lep->Energy()    , evt_weight_ );
                      FillHisto( h_AnLepEnergy  , AnLep->Energy()  , evt_weight_ );
                      FillHisto( h_NuEnergy     , Nu->Energy()     , evt_weight_ );
                      FillHisto( h_AnNuEnergy   , AnNu->Energy()   , evt_weight_ );
+                     // kinematics of objects after top reco
+                     FillHisto( h_bJetpt       , bJet->Pt()       , evt_weight_ );
+                     FillHisto( h_bJeteta      , bJet->Eta()      , evt_weight_ );
+                     FillHisto( h_bJetphi      , bJet->Phi()      , evt_weight_ );
+                     FillHisto( h_AnbJetpt     , AnbJet->Pt()     , evt_weight_ );
+                     FillHisto( h_AnbJeteta    , AnbJet->Eta()    , evt_weight_ );
+                     FillHisto( h_AnbJetphi    , AnbJet->Phi()    , evt_weight_ );
+                     FillHisto( h_Leppt        , Lep->Pt()        , evt_weight_ );
+                     FillHisto( h_Lepeta       , Lep->Eta()       , evt_weight_ );
+                     FillHisto( h_Lepphi       , Lep->Phi()       , evt_weight_ );
+                     FillHisto( h_AnLeppt      , AnLep->Pt()      , evt_weight_ );
+                     FillHisto( h_AnLepeta     , AnLep->Eta()     , evt_weight_ );
+                     FillHisto( h_AnLepphi     , AnLep->Phi()     , evt_weight_ );
                   
                      /// Kin Solver Purity ... ///
                      FillHisto( h2_TopMassVsLepBMass    , Top->M() ,((*Lep)+(*AnbJet)).M()   , evt_weight_ );
@@ -3723,8 +3734,6 @@ void ssb_analysis::DeclareHistos()
 
    h_bJetEnergy   = new TH1D(Form("h_bJetEnergy" ), Form("bJet Energy"   ), 1000, 0.0, 1000); h_bJetEnergy->Sumw2(); 
    h_AnbJetEnergy = new TH1D(Form("h_AnbJetEnergy" ), Form("b-barJet Energy" ), 1000, 0.0, 1000); h_AnbJetEnergy->Sumw2(); 
-   h_bJetPt   = new TH1D(Form("h_bJetPt" ), Form("bJet Pt"   ), 1000, 0.0, 1000); h_bJetPt->Sumw2(); 
-   h_AnbJetPt = new TH1D(Form("h_AnbJetPt" ), Form("b-barJet Pt" ), 1000, 0.0, 1000); h_AnbJetPt->Sumw2();
 
    h_Lep1Energy = new TH1D(Form("h_Lep1Energy" ), Form("Leading Lepton Energy"   ), 400, 0.0, 400); h_Lep1Energy->Sumw2(); 
    h_Lep2Energy = new TH1D(Form("h_Lep2Energy" ), Form("Second Leading Lepton Energy" ), 400, 0.0, 400); h_Lep2Energy->Sumw2();
@@ -3740,6 +3749,19 @@ void ssb_analysis::DeclareHistos()
 
    h_GenNuEnergy   = new TH1D(Form("h_GenNuEnergy" ), Form("Nuetrino Energy At Genrator Level"   ), 2000, 0.0, 2000); h_GenNuEnergy->Sumw2();
    h_GenAnNuEnergy = new TH1D(Form("h_GenAnNuEnergy" ), Form("anti-Nuetrino Energy At Genrator Level" ), 2000, 0.0, 2000); h_GenAnNuEnergy->Sumw2();
+   // kinematics of objects after top reco
+   h_bJetpt    = new TH1D(Form("_h_bJetpt_")     ,Form("bJet pT")           ,1000,    0.0,    1000);   h_bJetpt->Sumw2(); 
+   h_bJeteta   = new TH1D(Form("_h_bJeteta_")    ,Form("bJet Eta")          ,50,      -2.5,   2.5);    h_bJeteta->Sumw2(); 
+   h_bJetphi   = new TH1D(Form("_h_bJetphi_")    ,Form("bJet Phi")          ,24,      -1*pi,  pi);     h_bJetphi->Sumw2(); 
+   h_AnbJetpt  = new TH1D(Form("_h_AnbJetpt_")   ,Form("b-barJet pT")       ,1000,    0.0,    1000);   h_AnbJetpt->Sumw2();
+   h_AnbJeteta = new TH1D(Form("_h_AnbJeteta_")  ,Form("b-barJet Eta")      ,50,      -2.5,   2.5);    h_AnbJeteta->Sumw2();
+   h_AnbJetphi = new TH1D(Form("_h_AnbJetphi_")  ,Form("b-barJet Phi")      ,24,      -1*pi,  pi);     h_AnbJetphi->Sumw2();
+   h_Leppt     = new TH1D(Form("_h_Leppt_")      ,Form("Lepton pT")         ,1000,    0.0,    1000);   h_Leppt->Sumw2();
+   h_Lepeta    = new TH1D(Form("_h_Lepeta_")     ,Form("Lepton Eta")        ,50,      -2.5,   2.5);    h_Lepeta->Sumw2();
+   h_Lepphi    = new TH1D(Form("_h_Lepphi_")     ,Form("Lepton Phi")        ,24,      -1*pi,  pi);     h_Lepphi->Sumw2();
+   h_AnLeppt   = new TH1D(Form("_h_AnLeppt_")    ,Form("anti-Lepton pT")    ,1000,    0.0,    1000);   h_AnLeppt->Sumw2();
+   h_AnLepeta  = new TH1D(Form("_h_AnLepeta_")   ,Form("anti-Lepton Eta")   ,50,      -2.5,   2.5);    h_AnLepeta->Sumw2();
+   h_AnLepphi  = new TH1D(Form("_h_AnLepphi_")   ,Form("anti-Lepton Phi")   ,24,      -1*pi,  pi);     h_AnLepphi->Sumw2();
 
    h_CPO3_reco         = new TH1D(Form("h_CPO3_reco"   ), Form("CPO3_reco"   ), 200, -10, 10); h_CPO3_reco->Sumw2();
    h_CPO3_reco_JPRUp   = new TH1D(Form("h_CPO3_reco_JPRUp"     ), Form("CPO3_reco_JPRUp"     ), 200, -10, 10); h_CPO3_reco_JPRUp->Sumw2();
