@@ -27,7 +27,7 @@ samplelist = [
     #["TTbar_WQQ",[]],
     #["TTbar_ZQQ",[]],
     #["TTbar_ZToLLNuNu",[]],
-    ["TTJets_others",["218"]],
+    ["TTJets_others",["139"]],
     #["TTJets_Signal",[]],
     #["WJetsToLNu",[]],
     #["WW",[]],
@@ -42,7 +42,7 @@ samplelist = [
     #["TTJets_Signal_dtG_m2p60364",["3","8","12","19","20","25"]]
 ]
 
-version = "v6_O3v2_3"
+version = "v6_O3v2_3_dR"
 
 for sample in range(len(samplelist)):
     ### set up jobversion ###

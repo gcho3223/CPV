@@ -26,12 +26,12 @@ samplelist=(
     #"TTbar_WQQ" 
     #"TTbar_ZQQ" 
     #"TTbar_ZToLLNuNu" 
-    "TTJets_others" 
+    #"TTJets_others" 
     #"TTJets_Signal" 
     #"WJetsToLNu" 
     #"WW" 
     #"WZ" 
-    #"ZZ" 
+    "ZZ" 
     ### CPV samples ### 
     #"TTJets_Signal_dtG_0" 
     #"TTJets_Signal_dtG_0p5207" 
@@ -48,7 +48,7 @@ samplelist=(
 ###########################
 ### version information ###
 ###########################
-version="v6_O3v2_3"
+version="v6_O3v2_3_dR"
 
 #########################################################
 ### set up sample_path                                ###

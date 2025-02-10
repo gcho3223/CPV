@@ -2,22 +2,22 @@
 
 samplelist=( 
     ### Data & MC Samples ###
-    #"Data_DoubleMuon_Run2016B" 
-    #"Data_DoubleMuon_Run2016C" 
-    #"Data_DoubleMuon_Run2016D" 
-    #"Data_DoubleMuon_Run2016E" 
-    #"Data_DoubleMuon_Run2016F" 
-    #"Data_DoubleMuon_Run2016G" 
-    #"Data_DoubleMuon_Run2016HV2" 
-    #"Data_DoubleMuon_Run2016HV3" 
-    #"Data_SingleMuon_Run2016B" 
-    #"Data_SingleMuon_Run2016C" 
-    #"Data_SingleMuon_Run2016D" 
-    #"Data_SingleMuon_Run2016E" 
-    #"Data_SingleMuon_Run2016F" 
-    #"Data_SingleMuon_Run2016G" 
-    #"Data_SingleMuon_Run2016HV2" 
-    #"Data_SingleMuon_Run2016HV3" 
+    "Data_DoubleMuon_Run2016B" 
+    "Data_DoubleMuon_Run2016C" 
+    "Data_DoubleMuon_Run2016D" 
+    "Data_DoubleMuon_Run2016E" 
+    "Data_DoubleMuon_Run2016F" 
+    "Data_DoubleMuon_Run2016G" 
+    "Data_DoubleMuon_Run2016HV2" 
+    "Data_DoubleMuon_Run2016HV3" 
+    "Data_SingleMuon_Run2016B" 
+    "Data_SingleMuon_Run2016C" 
+    "Data_SingleMuon_Run2016D" 
+    "Data_SingleMuon_Run2016E" 
+    "Data_SingleMuon_Run2016F" 
+    "Data_SingleMuon_Run2016G" 
+    "Data_SingleMuon_Run2016HV2" 
+    "Data_SingleMuon_Run2016HV3" 
     #"DYJetsToLL_M_10To50" 
     #"DYJetsToLL_M_50" 
     #"ST_tW_antitop" 
@@ -31,7 +31,7 @@ samplelist=(
     #"WJetsToLNu" 
     #"WW" 
     #"WZ" 
-    "ZZ"
+    #"ZZ"
     ### CPV samples ###
     #"TTJets_Signal_dtG_0" 
     #"TTJets_Signal_dtG_0p5207" 
@@ -41,8 +41,13 @@ samplelist=(
     #"TTJets_Signal_dtG_m1p0415" 
     #"TTJets_Signal_dtG_m2p60364" 
 )
+#############################
+# < script usage >          #
+# ./submit_condor.sh [re]   #
+# re: re-submit jobs        #
+#############################
 ### version information ###
-version="v6_O3v2_3_dR"
+version="v7"
 ### submit jobs for each sample ###
 for sample in "${samplelist[@]}";
 do
@@ -53,7 +58,7 @@ do
         sample_path="./Job_Version/${version}/Dataset"
     fi
     cd ${sample_path}/${sample}
-    if [ "$1" == "re" || "$1" == "-r" ]; then
+    if [ "$1" == "re" ]; then
         condor_submit "recondor_sub.sub"
     else
         condor_submit "condor_sub.sub"
